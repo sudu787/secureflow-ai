@@ -198,3 +198,28 @@ export const markNotificationRead = (id: number) =>
   fetchAPI<any>(`/api/notifications/${id}/read`, { method: 'PATCH' });
 export const markAllNotificationsRead = () =>
   fetchAPI<any>('/api/notifications/mark-all-read', { method: 'POST' });
+
+// ─── Security Testing ─────────────────────────────────────────────────────────
+export const testPromptInjection = (prompt: string) =>
+  fetchAPI<any>('/api/security/test-injection', {
+    method: 'POST',
+    body: JSON.stringify({ prompt, test_type: 'prompt_injection' }),
+  });
+export const getAttackSamples = () =>
+  fetchAPI<any>('/api/security/attack-samples');
+
+// ─── RAG Engine ───────────────────────────────────────────────────────────────
+export const getRagStats = () => fetchAPI<any>('/api/rag/stats');
+export const searchRag = (query: string, sourceFilter?: string) => {
+  const body: any = { query, top_k: 10 };
+  if (sourceFilter) body.source_filter = sourceFilter;
+  return fetchAPI<any>('/api/rag/search', {
+    method: 'POST',
+    body: JSON.stringify(body)
+  });
+};
+
+// ─── Knowledge Graph ────────────────────────────────────────────────────────────
+export const getGraphStats = () => fetchAPI<any>('/api/knowledge-graph/stats');
+export const getGraphVisualization = () => fetchAPI<any>('/api/knowledge-graph/visualization');
+export const getEntityContext = (type: string, id: string) => fetchAPI<any>(`/api/knowledge-graph/entity/${type}/${id}`);

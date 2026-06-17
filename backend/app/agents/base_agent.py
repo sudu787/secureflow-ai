@@ -440,10 +440,10 @@ class BaseAgent(ABC):
         Returns formatted context string to prepend to LLM prompt.
         """
         try:
-            from app.knowledge.knowledge_base import get_knowledge_base
+            from app.knowledge.rag_engine import get_rag_engine
             from app.config import settings
-            kb = get_knowledge_base()
-            return kb.get_context_for_prompt(query, top_k=settings.RAG_TOP_K)
+            engine = get_rag_engine()
+            return engine.get_context_for_prompt(query, top_k=settings.RAG_TOP_K)
         except Exception as e:
             logger.debug(f"[{self.name}] Knowledge retrieval skipped: {e}")
             return ""

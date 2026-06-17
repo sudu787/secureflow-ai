@@ -200,6 +200,16 @@ class IngestionService:
 
             if all_alerts:
                 db.commit()
+
+                # Feed alerts into knowledge graph
+                try:
+                    from app.knowledge.knowledge_graph import get_knowledge_graph
+                    kg = get_knowledge_graph()
+                    for alert_data in all_alerts:
+                        kg.ingest_alert(alert_data)
+                except Exception as kg_err:
+                    logger.warning(f"Knowledge graph ingestion error: {kg_err}")
+
                 logger.info(
                     f"📊 Ingested {len(events)} events, created {len(all_alerts)} alerts"
                 )

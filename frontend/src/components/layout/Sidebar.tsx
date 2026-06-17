@@ -10,6 +10,8 @@ const navItems = [
   { href: "/incidents", label: "Incidents", icon: "🔍" },
   { href: "/tickets", label: "Tickets", icon: "🎫" },
   { section: "Intelligence" },
+  { href: "/knowledge", label: "Knowledge Base", icon: "🧠" },
+  { href: "/graph", label: "Graph Explorer", icon: "🕸️" },
   { href: "/chat", label: "AI Assistant", icon: "🤖" },
   { href: "/logs", label: "Log Viewer", icon: "📋" },
   { section: "System" },

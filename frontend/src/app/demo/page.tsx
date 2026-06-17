@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getDemoScenarios, startDemoScenario, startAllScenarios, resetDemo } from "@/lib/api";
+import { getDemoScenarios, startDemoScenario, startAllScenarios, resetDemo, testPromptInjection, getAttackSamples } from "@/lib/api";
 import type { DemoScenario } from "@/lib/types";
 
 export default function DemoPage() {
@@ -10,7 +10,20 @@ export default function DemoPage() {
   const [results, setResults] = useState<Record<string, any>>({});
   const [runningAll, setRunningAll] = useState(false);
 
-  useEffect(() => { loadScenarios(); }, []);
+  // Security Test State
+  const [attackSamples, setAttackSamples] = useState<any>(null);
+  const [testPrompt, setTestPrompt] = useState("");
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<any>(null);
+
+  useEffect(() => { 
+    loadScenarios(); 
+    loadAttackSamples();
+  }, []);
+
+  async function loadAttackSamples() {
+    try { setAttackSamples(await getAttackSamples()); } catch {}
+  }
 
   async function loadScenarios() {
     try { setScenarios(await getDemoScenarios()); } catch {}
@@ -51,6 +64,20 @@ export default function DemoPage() {
       alert("Demo data reset successfully!");
     } catch (e: any) {
       alert("Error: " + e.message);
+    }
+  }
+
+  async function handleTestSecurity() {
+    if (!testPrompt.trim()) return;
+    setIsTesting(true);
+    setTestResult(null);
+    try {
+      const result = await testPromptInjection(testPrompt);
+      setTestResult(result);
+    } catch (e: any) {
+      alert("Test failed: " + e.message);
+    } finally {
+      setIsTesting(false);
     }
   }
 
@@ -142,6 +169,117 @@ export default function DemoPage() {
             <div style={{ fontSize: "13px", marginTop: "8px" }}>Make sure the backend is running on port 8000</div>
           </div>
         )}
+      </div>
+
+      {/* Security Testing Section */}
+      <div style={{ marginTop: "40px" }}>
+        <h2 className="sf-page-title" style={{ fontSize: "20px", marginBottom: "8px" }}>🛡️ Self-Defending AI: Live Security Test</h2>
+        <p className="sf-page-subtitle" style={{ marginBottom: "20px" }}>
+          Try to jailbreak the agents or inject malicious prompts. Our 11-category defense system runs <em>before</em> any LLM sees the input.
+        </p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+          {/* Input Panel */}
+          <div className="sf-card" style={{ padding: "24px" }}>
+            <div style={{ marginBottom: "16px" }}>
+              <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "var(--sf-text-primary)", marginBottom: "8px" }}>
+                Select an Attack Sample (or write your own)
+              </label>
+              <select 
+                className="sf-input"
+                style={{ width: "100%", marginBottom: "12px", background: "var(--sf-bg-elevated)", color: "var(--sf-text-primary)" }}
+                onChange={(e) => setTestPrompt(e.target.value)}
+                defaultValue=""
+              >
+                <option value="" disabled>Choose an attack vector...</option>
+                {attackSamples?.categories?.map((cat: any) => (
+                  <optgroup key={cat.category} label={`${cat.name} (${cat.severity})`}>
+                    {cat.samples.map((sample: string, i: number) => (
+                      <option key={i} value={sample}>{sample}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+              
+              <textarea
+                className="sf-input"
+                style={{ width: "100%", height: "120px", resize: "none", fontFamily: "monospace", fontSize: "13px" }}
+                placeholder="Enter prompt injection attempt..."
+                value={testPrompt}
+                onChange={(e) => setTestPrompt(e.target.value)}
+              />
+            </div>
+            
+            <button 
+              className="sf-btn sf-btn-danger" 
+              style={{ width: "100%", justifyContent: "center" }}
+              onClick={handleTestSecurity}
+              disabled={isTesting || !testPrompt.trim()}
+            >
+              {isTesting ? "⏳ Testing Defense Layer..." : "💥 Launch Attack"}
+            </button>
+          </div>
+
+          {/* Results Panel */}
+          <div className="sf-card" style={{ padding: "24px", display: "flex", flexDirection: "column" }}>
+            <h3 style={{ fontSize: "14px", fontWeight: 600, color: "var(--sf-text-primary)", marginBottom: "16px", borderBottom: "1px solid var(--sf-border)", paddingBottom: "12px" }}>
+              Defense System Analysis
+            </h3>
+            
+            {testResult ? (
+              <div className="sf-animate-in">
+                {testResult.is_blocked ? (
+                  <div style={{ padding: "16px", borderRadius: "8px", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <span style={{ fontSize: "20px" }}>🛡️</span>
+                      <strong style={{ color: "#fca5a5", fontSize: "16px" }}>ATTACK BLOCKED</strong>
+                    </div>
+                    
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px", fontSize: "13px" }}>
+                      <div>
+                        <div style={{ color: "var(--sf-text-muted)", marginBottom: "4px" }}>Layer Detected</div>
+                        <div style={{ color: "var(--sf-text-primary)", fontWeight: 600 }}>{testResult.defense_layer}</div>
+                      </div>
+                      <div>
+                        <div style={{ color: "var(--sf-text-muted)", marginBottom: "4px" }}>Attack Category</div>
+                        <div style={{ color: "var(--sf-text-primary)", fontWeight: 600 }}>{testResult.category?.replace(/_/g, ' ').toUpperCase()}</div>
+                      </div>
+                      <div>
+                        <div style={{ color: "var(--sf-text-muted)", marginBottom: "4px" }}>Severity</div>
+                        <span className={`sf-badge critical`}>{testResult.severity?.toUpperCase()}</span>
+                      </div>
+                      <div>
+                        <div style={{ color: "var(--sf-text-muted)", marginBottom: "4px" }}>Confidence</div>
+                        <div style={{ color: "var(--sf-text-primary)", fontWeight: 600 }}>{(testResult.confidence * 100).toFixed(0)}%</div>
+                      </div>
+                    </div>
+
+                    <div style={{ fontSize: "13px" }}>
+                      <div style={{ color: "var(--sf-text-muted)", marginBottom: "4px" }}>Reasoning</div>
+                      <div style={{ color: "var(--sf-text-secondary)", fontFamily: "monospace", padding: "8px", background: "rgba(0,0,0,0.2)", borderRadius: "4px" }}>
+                        {testResult.details}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ padding: "16px", borderRadius: "8px", background: "rgba(16, 185, 129, 0.05)", border: "1px solid rgba(16, 185, 129, 0.2)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <span style={{ fontSize: "20px" }}>✅</span>
+                      <strong style={{ color: "var(--sf-success)", fontSize: "16px" }}>INPUT PASSED</strong>
+                    </div>
+                    <div style={{ fontSize: "13px", color: "var(--sf-text-secondary)" }}>
+                      No malicious intent detected by Layer 1. The prompt would be passed to the LLM.
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--sf-text-muted)", fontSize: "13px" }}>
+                Select a payload and launch an attack to see how the defense system responds.
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

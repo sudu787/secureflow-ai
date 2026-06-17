@@ -12,6 +12,9 @@ from app.database import init_db
 from app.api import auth, dashboard, alerts, incidents, tickets, chat, demo, agents, events
 from app.api import ingestion as ingestion_api
 from app.api import notifications as notifications_api
+from app.api import knowledge_graph as knowledge_graph_api
+from app.api import security_testing as security_testing_api
+from app.api import rag as rag_api
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
 logger = logging.getLogger("secureflow")
@@ -25,9 +28,17 @@ async def lifespan(app: FastAPI):
 
     # Pre-load knowledge base
     try:
-        from app.knowledge.knowledge_base import get_knowledge_base
-        kb = get_knowledge_base()
-        logger.info(f"✅ Knowledge base loaded: {len(kb._documents)} documents")
+        from app.knowledge.rag_engine import get_rag_engine
+        engine = get_rag_engine()
+        logger.info("✅ RAG engine loaded")
+    except Exception as e:
+        logger.warning(f"RAG engine failed to load: {e}")
+
+    # Initialize knowledge graph
+    try:
+        from app.knowledge.knowledge_graph import get_knowledge_graph
+        kg = get_knowledge_graph()
+        logger.info(f"✅ Knowledge graph initialized (available: {kg.available})")
     except Exception as e:
         logger.warning(f"Knowledge base failed to load: {e}")
 
@@ -77,6 +88,9 @@ app.include_router(agents.router, prefix="/api/agents", tags=["Agents"])
 app.include_router(demo.router, prefix="/api/demo", tags=["Demo"])
 app.include_router(ingestion_api.router, prefix="/api/ingestion", tags=["Ingestion"])
 app.include_router(notifications_api.router, prefix="/api/notifications", tags=["Notifications"])
+app.include_router(knowledge_graph_api.router, prefix="/api/knowledge-graph", tags=["Knowledge Graph"])
+app.include_router(security_testing_api.router, prefix="/api/security", tags=["Security Testing"])
+app.include_router(rag_api.router, prefix="/api/rag", tags=["RAG Engine"])
 
 
 @app.get("/api/health")
@@ -84,9 +98,11 @@ async def health_check():
     """Health check with component status."""
     from app.knowledge.knowledge_base import get_knowledge_base
     from app.ingestion.ingestion_service import get_ingestion_service
+    from app.knowledge.knowledge_graph import get_knowledge_graph
 
     kb = get_knowledge_base()
     ingestion = get_ingestion_service()
+    kg = get_knowledge_graph()
 
     return {
         "status": "healthy",
@@ -107,5 +123,6 @@ async def health_check():
                 "canary_tokens": "active",
                 "policy_engine": "active",
             },
+            "knowledge_graph": kg.get_graph_stats(),
         },
     }
