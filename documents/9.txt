@@ -1,0 +1,518 @@
+You are a Principal Product Designer, AI UX Architect, SOC Manager, Security Operations Director, and Hackathon Judge.
+
+Project:
+SecureFlow AI
+
+Current Vision:
+
+SecureFlow AI is an Autonomous Security Operations Platform featuring:
+
+* Multi-Agent AI System
+* Cybersecurity RAG Engine
+* Security Knowledge Graph
+* Organizational Memory System
+* Threat Intelligence Platform
+* Risk Prediction Engine
+* Compliance Intelligence
+* Autonomous Response Workflows
+
+Previous Design Phases:
+
+Part 1:
+Product Positioning
+
+Part 2:
+Advanced AI Agent Ecosystem
+
+Part 3:
+Enterprise Technical Architecture
+
+Part 4:
+Cybersecurity RAG Engine
+
+Part 5:
+Security Knowledge Graph
+
+Part 6:
+AI Memory System
+
+This prompt focuses ONLY on:
+
+# PART 7 — FRONTEND EXPERIENCE, EXECUTIVE DASHBOARDS & DEMO WOW FACTOR
+
+Your task is to design a world-class frontend experience that makes SecureFlow AI look like an enterprise-grade autonomous cyber intelligence platform.
+
+The design must maximize:
+
+* Innovation Score
+* Technical Architecture Score
+* Documentation Score
+* Demo Presentation Impact
+
+The platform should visually resemble a next-generation AI Security Command Center rather than a traditional dashboard.
+
+---
+
+SECTION 1 — CURRENT UI REVIEW
+
+Analyze a typical SOC dashboard.
+
+Identify:
+
+* Common weaknesses
+* Poor user experience
+* Information overload
+* Lack of AI explainability
+* Lack of executive visibility
+
+Explain:
+
+How SecureFlow AI can become significantly better.
+
+---
+
+SECTION 2 — COMPLETE PLATFORM NAVIGATION
+
+Design the full navigation structure.
+
+Create modules:
+
+### Executive Command Center
+
+### Security Operations Center
+
+### AI Investigation Center
+
+### Threat Intelligence Center
+
+### Knowledge Graph Explorer
+
+### Cyber Memory Center
+
+### Compliance Intelligence Center
+
+### Risk Prediction Center
+
+### Autonomous Response Center
+
+### Asset Intelligence Center
+
+### Settings & Administration
+
+For each page provide:
+
+* Purpose
+* Users
+* Key features
+
+---
+
+SECTION 3 — EXECUTIVE COMMAND CENTER
+
+Design a boardroom-level dashboard.
+
+Target users:
+
+* CISO
+* CTO
+* Executives
+* Security Managers
+
+Widgets:
+
+* Organizational Risk Score
+* Security Posture Score
+* Active Incidents
+* Predicted Threats
+* Compliance Status
+* AI Confidence Metrics
+* Threat Forecasting
+* Asset Exposure
+
+Provide:
+
+* Layout design
+* Widget descriptions
+* Data sources
+* Visualization types
+
+Explain why executives would love it.
+
+---
+
+SECTION 4 — AI INVESTIGATION CENTER
+
+Design the core investigation workspace.
+
+Features:
+
+### AI Investigation Chat
+
+### Incident Timeline
+
+### Attack Path Reconstruction
+
+### MITRE Mapping
+
+### Evidence Collection
+
+### Related Incidents
+
+### Threat Actor Analysis
+
+### Recommended Actions
+
+Show:
+
+How analysts interact with AI.
+
+Provide wireframe concepts.
+
+---
+
+SECTION 5 — KNOWLEDGE GRAPH EXPLORER
+
+Design a visual graph interface.
+
+Capabilities:
+
+* Relationship Mapping
+* Threat Actor Visualization
+* Attack Chains
+* Asset Relationships
+* Risk Propagation
+
+Users should be able to:
+
+Click Incident
+→ View Related Users
+→ View Devices
+→ View Assets
+→ View Threat Actors
+
+Design:
+
+* Graph UI
+* Filters
+* Search
+* Interaction flows
+
+Explain demo value.
+
+---
+
+SECTION 6 — CYBER MEMORY CENTER
+
+Design a dedicated memory dashboard.
+
+Features:
+
+### Similar Incident Search
+
+### Historical Investigations
+
+### Organizational Learning
+
+### Threat Memory
+
+### Compliance Memory
+
+### Analyst Memory
+
+Provide:
+
+* Layout
+* Search experiences
+* Visualization ideas
+
+Explain how this demonstrates innovation.
+
+---
+
+SECTION 7 — THREAT INTELLIGENCE CENTER
+
+Design a threat intelligence portal.
+
+Widgets:
+
+* Threat Actor Profiles
+* Emerging Threats
+* CVE Tracking
+* MITRE ATT&CK Coverage
+* IOC Intelligence
+* Campaign Tracking
+
+Provide:
+
+* Layout
+* Components
+* Visualizations
+
+Explain how AI agents use it.
+
+---
+
+SECTION 8 — RISK PREDICTION CENTER
+
+Design a predictive analytics dashboard.
+
+Features:
+
+### Predicted Incidents
+
+### High-Risk Assets
+
+### High-Risk Users
+
+### Attack Forecasting
+
+### Exposure Trends
+
+### Security Score Forecasting
+
+Visualizations:
+
+* Risk Heatmaps
+* Trend Charts
+* Probability Graphs
+* Asset Risk Rankings
+
+Explain:
+
+How this becomes a major innovation differentiator.
+
+---
+
+SECTION 9 — COMPLIANCE INTELLIGENCE CENTER
+
+Design compliance dashboards.
+
+Frameworks:
+
+* ISO 27001
+* NIST
+* CIS Controls
+* SOC2
+* PCI DSS
+
+Features:
+
+* Compliance Score
+* Gap Analysis
+* AI Recommendations
+* Audit Readiness
+
+Provide layouts.
+
+Explain executive value.
+
+---
+
+SECTION 10 — AUTONOMOUS RESPONSE CENTER
+
+Design a command center for automated actions.
+
+Features:
+
+### Pending Approvals
+
+### AI Recommended Actions
+
+### Executed Responses
+
+### Rollback Controls
+
+### Agent Decision Logs
+
+Provide:
+
+* UI layout
+* Workflow diagrams
+
+Explain trust-building mechanisms.
+
+---
+
+SECTION 11 — REAL-TIME SECURITY COMMAND CENTER
+
+Design a futuristic SOC view.
+
+Features:
+
+* Live Alerts
+* Agent Activity
+* Incident Tracking
+* Threat Feed
+* Global Threat Map
+* AI Decision Stream
+
+Think:
+
+Mission Control Center
+
+or
+
+Security War Room
+
+Provide dashboard design.
+
+---
+
+SECTION 12 — EXPLAINABLE AI EXPERIENCE
+
+Design explainability components.
+
+Examples:
+
+Why was severity P1?
+
+Why was this asset marked high risk?
+
+Why was this response recommended?
+
+Show:
+
+* Decision Trees
+* Confidence Scores
+* Evidence Sources
+* Memory References
+* Graph Evidence
+
+Provide UX patterns.
+
+---
+
+SECTION 13 — NEXT.JS IMPLEMENTATION PLAN
+
+For every major page provide:
+
+Frontend Structure:
+
+* Routes
+* Components
+* Hooks
+* State Management
+
+Recommended Libraries:
+
+* Recharts
+* React Flow
+* Cytoscape
+* Framer Motion
+* TanStack Query
+
+Provide architecture.
+
+---
+
+SECTION 14 — DESIGN SYSTEM
+
+Create a complete design language.
+
+Include:
+
+* Color Palette
+* Typography
+* Component Standards
+* Dashboard Cards
+* Tables
+* Graph Components
+
+Design goals:
+
+* Enterprise
+* Modern
+* Futuristic
+* Professional
+
+Explain why.
+
+---
+
+SECTION 15 — DEMO DAY STRATEGY
+
+Design a 3-minute demo.
+
+Flow:
+
+1. Simulated Attack
+2. Alert Creation
+3. AI Investigation
+4. Graph Exploration
+5. Memory Recall
+6. Threat Prediction
+7. Autonomous Response
+8. Executive Report
+
+For every step explain:
+
+* What appears on screen
+* What judges see
+* What judges think
+
+Maximize wow-factor.
+
+---
+
+SECTION 16 — HACKATHON MVP PRIORITIZATION
+
+Separate into:
+
+Tier 1:
+Must Build
+
+Tier 2:
+High Impact
+
+Tier 3:
+Future Vision
+
+For each provide:
+
+* Development effort
+* Complexity
+* Demo value
+* Innovation impact
+
+---
+
+SECTION 17 — IMPLEMENTATION GUIDE
+
+Provide:
+
+Frontend Files
+
+Next.js Pages
+
+Reusable Components
+
+Dashboard Widgets
+
+Visualization Libraries
+
+State Management
+
+API Integrations
+
+Backend Endpoints Needed
+
+Database Dependencies
+
+---
+
+SECTION 18 — HACKATHON WINNING FEATURES
+
+Identify the top 10 frontend features that:
+
+* Can be built quickly
+* Look enterprise-grade
+* Demonstrate AI innovation
+* Impress judges immediately
+
+Rank them.
+
+Explain why.
+
+Goal:
+
+Design a next-generation AI Security Command Center that visually demonstrates autonomous intelligence, predictive security, organizational memory, graph intelligence, and AI-driven security operations, making SecureFlow AI one of the most memorable projects in the hackathon.

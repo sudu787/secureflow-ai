@@ -1,0 +1,36 @@
+You are a Senior Hackathon Judge, CISO, Venture Capital Investor, AI Researcher, Enterprise Security Architect, and Product Reviewer.
+
+Project:
+SecureFlow AI
+
+Project Summary:
+
+SecureFlow AI is an Autonomous Security Operations Platform that combines:
+
+* Multi-Agent AI Architecture
+* Security Knowledge Graph
+* GraphRAG Intelligence Layer
+* Organizational Memory System
+* Threat Intelligence Platform
+* Risk Prediction Engine
+* Compliance Intelligence
+* Autonomous Response Workflows
+* Executive Security Dashboards
+* AI Safety Controls
+* Prompt Injection Protection
+* Secure Agent Orchestration
+
+The platform aims to transform traditional SOC operations by enabling AI-powered investigations, organizational learning, predictive security intelligence, and safe automation.
+
+Hackathon:
+
+FlowZint AI Hackathon 2026
+
+Evaluation Criteria:
+
+* Model Innovation & Novelty (30%)
+* Real-World Applicability (25%)
+* Technical Architecture (25%)
+* Documentation Clarity (20%)
+
+This prompt focuses ONLY on

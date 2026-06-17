@@ -181,3 +181,20 @@ export const getAgentStatus = () =>
 
 // ─── Health ───────────────────────────────────────────────────────────────────
 export const getHealth = () => fetchAPI<any>('/api/health');
+
+// ─── Ingestion ────────────────────────────────────────────────────────────────
+export const getIngestionStatus = () => fetchAPI<any>('/api/ingestion/status');
+export const startIngestion = () =>
+  fetchAPI<any>('/api/ingestion/start', { method: 'POST' });
+export const stopIngestion = () =>
+  fetchAPI<any>('/api/ingestion/stop', { method: 'POST' });
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+export const getNotifications = (limit = 50) =>
+  fetchAPI<any[]>(`/api/notifications?limit=${limit}`);
+export const getUnreadNotificationCount = () =>
+  fetchAPI<{ count: number }>('/api/notifications/unread-count');
+export const markNotificationRead = (id: number) =>
+  fetchAPI<any>(`/api/notifications/${id}/read`, { method: 'PATCH' });
+export const markAllNotificationsRead = () =>
+  fetchAPI<any>('/api/notifications/mark-all-read', { method: 'POST' });

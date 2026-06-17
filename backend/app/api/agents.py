@@ -52,7 +52,7 @@ async def agent_status():
                 "name": a["obj"].name,
                 "description": a["obj"].description,
                 "llm_provider": a["obj"].llm_provider,
-                "llm_display": "Google Gemini" if a["obj"].llm_provider == "gemini" else "xAI Grok",
+                "llm_display": "Google Gemini" if a["obj"].llm_provider == "gemini" else ("xAI Grok" if a["obj"].llm_provider == "grok" else "Groq"),
                 "capabilities": a["obj"].capabilities,
                 "version": a["obj"].version,
                 "status": "active",
@@ -62,6 +62,7 @@ async def agent_status():
         "llm_providers": {
             "gemini": {"name": "Google Gemini", "model": "gemini-2.0-flash", "agents": ["triage_agent", "remediation_agent"]},
             "grok": {"name": "xAI Grok", "model": "grok-3-mini-fast", "agents": ["investigation_agent", "reporting_agent", "it_support_agent"]},
+            "groq": {"name": "Groq", "model": "llama-3.3-70b-versatile", "agents": ["base_agent"]},
         },
     }
 

@@ -1,0 +1,540 @@
+You are a Principal Engineering Manager, AI Platform Architect, Startup CTO, Product Delivery Lead, and Hackathon Judge.
+
+Project:
+SecureFlow AI
+
+Current Vision:
+
+SecureFlow AI is an Autonomous Security Operations Platform that combines:
+
+* Multi-Agent AI
+* Security Knowledge Graph
+* GraphRAG
+* Organizational Memory
+* Threat Intelligence
+* Risk Prediction
+* Compliance Intelligence
+* Autonomous Response Workflows
+* Executive Security Dashboards
+
+Previous Design Phases Completed:
+
+Part 1:
+Product Positioning
+
+Part 2:
+AI Agent Ecosystem
+
+Part 3:
+Technical Architecture
+
+Part 4:
+Cybersecurity RAG Engine
+
+Part 5:
+Security Knowledge Graph
+
+Part 6:
+AI Memory System
+
+Part 7:
+Frontend & Dashboard Experience
+
+Part 8:
+Demo & Presentation Strategy
+
+This prompt focuses ONLY on:
+
+# PART 9 — IMPLEMENTATION ROADMAP, DEVELOPMENT PLAN & HACKATHON EXECUTION STRATEGY
+
+Your task is to convert the entire SecureFlow AI vision into a realistic implementation plan that can be executed by a small hackathon team within limited time.
+
+The objective is to maximize:
+
+* Innovation Score
+* Technical Architecture Score
+* Real-World Applicability Score
+* Documentation Score
+
+while minimizing unnecessary development effort.
+
+---
+
+SECTION 1 — REALITY CHECK
+
+Analyze all previous phases.
+
+For each major feature classify it as:
+
+### Essential
+
+Must be implemented.
+
+### Valuable
+
+Should be implemented if time permits.
+
+### Aspirational
+
+Can be mocked, simulated, or future roadmap.
+
+Explain why.
+
+---
+
+SECTION 2 — HACKATHON JUDGE PRIORITIZATION
+
+Based on the judging criteria:
+
+* Model Innovation & Novelty (30%)
+* Real-World Applicability (25%)
+* Technical Architecture (25%)
+* Documentation Clarity (20%)
+
+Rank all major features according to score impact.
+
+Examples:
+
+* Multi-Agent System
+* Knowledge Graph
+* Memory Engine
+* GraphRAG
+* Autonomous Response
+* Threat Prediction
+* Executive Dashboard
+* Compliance Center
+* Risk Forecasting
+* Threat Intelligence Portal
+
+For each provide:
+
+* Score impact
+* Demo impact
+* Development effort
+* Recommendation
+
+---
+
+SECTION 3 — MVP DEFINITION
+
+Define the smallest possible SecureFlow AI MVP that still appears highly advanced.
+
+Requirements:
+
+Must include:
+
+* Multi-Agent AI
+* Security Dashboard
+* AI Investigation
+* Graph Intelligence
+* Memory Recall
+* RAG
+* Autonomous Response Demo
+
+The MVP should be achievable within a hackathon timeline.
+
+Provide:
+
+* Components
+* User journeys
+* Backend services
+* Frontend pages
+
+---
+
+SECTION 4 — TIERED DEVELOPMENT PLAN
+
+Create three implementation tiers.
+
+### Tier 1 — Must Build
+
+These features must exist before submission.
+
+For each feature provide:
+
+* Purpose
+* Complexity
+* Estimated development hours
+* Demo impact
+
+### Tier 2 — High Value
+
+Implement if time remains.
+
+### Tier 3 — Future Vision
+
+Roadmap only.
+
+Provide detailed prioritization.
+
+---
+
+SECTION 5 — BACKEND IMPLEMENTATION PLAN
+
+Design backend development phases.
+
+Include:
+
+### Core APIs
+
+### Agent Framework
+
+### RAG Service
+
+### Memory Service
+
+### Graph Service
+
+### Risk Engine
+
+### Reporting Engine
+
+For each provide:
+
+* Required files
+* Service structure
+* API endpoints
+* Dependencies
+
+Provide a recommended project structure.
+
+---
+
+SECTION 6 — FRONTEND IMPLEMENTATION PLAN
+
+Design frontend development phases.
+
+Pages:
+
+* Dashboard
+* Investigation Center
+* AI Chat
+* Graph Explorer
+* Memory Center
+* Executive Dashboard
+* Threat Intelligence
+
+For each page provide:
+
+* Components
+* API integrations
+* Visualizations
+* Complexity
+
+Provide folder structure.
+
+---
+
+SECTION 7 — DATABASE IMPLEMENTATION PLAN
+
+Design database rollout.
+
+Phase 1:
+
+Core Tables
+
+Phase 2:
+
+Memory Tables
+
+Phase 3:
+
+Graph Intelligence
+
+For each table provide:
+
+* Fields
+* Relationships
+* Priority
+
+Recommend:
+
+SQLite vs PostgreSQL for hackathon.
+
+Explain why.
+
+---
+
+SECTION 8 — KNOWLEDGE GRAPH MVP
+
+Design the simplest graph implementation that still looks impressive.
+
+Requirements:
+
+* Fast to build
+* Visually compelling
+* Realistic
+
+Explain:
+
+What relationships should be included.
+
+What can be deferred.
+
+Provide implementation guidance.
+
+---
+
+SECTION 9 — MEMORY MVP
+
+Design a lightweight memory system.
+
+Requirements:
+
+* Similar incident recall
+* Historical recommendations
+* Incident memory
+
+Avoid overengineering.
+
+Provide:
+
+Architecture
+
+Storage
+
+Retrieval
+
+UI concepts
+
+---
+
+SECTION 10 — RAG MVP
+
+Design the smallest RAG system that creates maximum demo impact.
+
+Recommended sources:
+
+* MITRE ATT&CK
+* OWASP
+* Security Playbooks
+
+Explain:
+
+* Data ingestion
+* Vector database
+* Retrieval
+* UI integration
+
+Recommend:
+
+Qdrant vs ChromaDB.
+
+Explain why.
+
+---
+
+SECTION 11 — DEMO DATA STRATEGY
+
+Design realistic mock data.
+
+Create:
+
+* Alerts
+* Incidents
+* Users
+* Assets
+* Vulnerabilities
+* Threat Actors
+
+Explain:
+
+How to generate believable security events.
+
+How to simulate attacks.
+
+How to make dashboards look alive.
+
+---
+
+SECTION 12 — DEVELOPMENT TIMELINE
+
+Create:
+
+24-Hour Plan
+
+48-Hour Plan
+
+72-Hour Plan
+
+1-Week Plan
+
+For each timeline:
+
+* Tasks
+* Priorities
+* Deliverables
+
+Provide recommended order.
+
+---
+
+SECTION 13 — TEAM STRUCTURE
+
+Assume:
+
+Team of 2
+
+Team of 3
+
+Team of 5
+
+For each:
+
+Assign responsibilities.
+
+Examples:
+
+* Frontend
+* Backend
+* AI
+* Documentation
+* Demo
+
+Provide optimal division of work.
+
+---
+
+SECTION 14 — DOCUMENTATION PLAN
+
+Design:
+
+README
+
+Architecture Docs
+
+API Docs
+
+Demo Guide
+
+Judge Submission Notes
+
+Provide templates.
+
+Explain:
+
+How documentation improves scoring.
+
+---
+
+SECTION 15 — TESTING STRATEGY
+
+Design:
+
+* Unit Testing
+* API Testing
+* Agent Testing
+* RAG Validation
+* Security Testing
+
+Focus on practical testing.
+
+Avoid enterprise overengineering.
+
+---
+
+SECTION 16 — DEPLOYMENT PLAN
+
+Provide:
+
+Local Deployment
+
+Docker Deployment
+
+Cloud Deployment
+
+Recommend:
+
+* Azure
+* AWS
+* GCP
+* Railway
+* Render
+
+For a hackathon.
+
+Explain tradeoffs.
+
+---
+
+SECTION 17 — RISKS & MITIGATIONS
+
+Identify:
+
+Top 20 implementation risks.
+
+Examples:
+
+* LLM latency
+* API costs
+* Graph complexity
+* RAG failures
+* Demo instability
+
+Provide mitigations.
+
+---
+
+SECTION 18 — FEATURE CUT LIST
+
+Identify features that sound impressive but should NOT be built for the hackathon.
+
+Explain:
+
+Why they are low ROI.
+
+Recommend alternatives.
+
+---
+
+SECTION 19 — FINAL RECOMMENDED BUILD
+
+Provide your final recommendation.
+
+Assume:
+
+* Small team
+* Limited time
+* Hackathon environment
+
+Identify:
+
+The exact feature set that maximizes judging scores while remaining realistic.
+
+Provide:
+
+* Must build
+* Should build
+* Nice to have
+* Do not build
+
+Rank everything.
+
+---
+
+SECTION 20 — HACKATHON WINNING EXECUTION PLAN
+
+Create a step-by-step execution blueprint.
+
+Day 1:
+Architecture
+
+Day 2:
+Implementation
+
+Day 3:
+Integration
+
+Day 4:
+Polish
+
+Day 5:
+Demo
+
+Day 6:
+Documentation
+
+Day 7:
+Submission
+
+Explain exactly how SecureFlow AI should be built to maximize the probability of winning the FlowZint AI Hackathon.

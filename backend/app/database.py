@@ -34,4 +34,5 @@ def get_db():
 def init_db():
     """Create all tables."""
     from app.models import user, event, alert, incident, ticket, agent_action, audit_log, chat_session  # noqa
+    from app.models import notification  # noqa
     Base.metadata.create_all(bind=engine)

@@ -1,0 +1,411 @@
+You are a Principal AI Engineer, Retrieval Systems Expert, Vector Database Architect, Cybersecurity Researcher, and Hackathon Judge.
+
+Project:
+SecureFlow AI
+
+Current Platform:
+
+SecureFlow AI is an AI-powered Security Operations Center (SOC) platform featuring:
+
+* Multi-Agent AI Architecture
+* Alert Management
+* Incident Response
+* Ticketing
+* Reporting
+* Threat Investigation
+* AI Chat Interface
+* Security Controls
+* Multi-LLM Support
+
+Hackathon Goal:
+
+Transform SecureFlow AI into a highly intelligent autonomous security platform by implementing a world-class RAG (Retrieval-Augmented Generation) system.
+
+This prompt focuses ONLY on:
+
+# PART 4 — ADVANCED RAG & SECURITY KNOWLEDGE ENGINE
+
+Your task is to design a production-grade RAG architecture specifically optimized for cybersecurity operations, threat hunting, incident response, compliance, and security investigations.
+
+The design should maximize:
+
+* Model Innovation & Novelty
+* Real-World Applicability
+* Technical Architecture
+* Demo Impact
+
+---
+
+SECTION 1 — CURRENT STATE ANALYSIS
+
+Analyze the current SecureFlow AI architecture.
+
+Identify:
+
+* Missing intelligence capabilities
+* Knowledge limitations
+* Hallucination risks
+* Investigation limitations
+* Compliance limitations
+* Threat intelligence limitations
+
+Explain why a RAG system is necessary.
+
+Provide examples.
+
+---
+
+SECTION 2 — CYBERSECURITY KNOWLEDGE SOURCES
+
+Design a comprehensive knowledge base.
+
+Include:
+
+### Threat Intelligence Sources
+
+* MITRE ATT&CK
+* MITRE D3FEND
+* ATT&CK Navigator
+* CAPEC
+* CWE
+* CVE
+* CISA KEV
+* NVD
+
+### Security Frameworks
+
+* NIST CSF
+* NIST 800-53
+* CIS Controls
+* ISO 27001
+* SOC2
+* PCI DSS
+
+### Security Guidance
+
+* OWASP Top 10
+* OWASP API Top 10
+* OWASP LLM Top 10
+* SANS Resources
+
+### Internal Data
+
+* Incident History
+* Tickets
+* Alerts
+* Investigation Reports
+* Remediation Playbooks
+* Security Policies
+* Asset Inventory
+
+For each source explain:
+
+* Why it matters
+* How it should be stored
+* How it should be retrieved
+
+---
+
+SECTION 3 — INGESTION PIPELINE
+
+Design a complete ingestion pipeline.
+
+Include:
+
+### Data Collection
+
+* APIs
+* Documents
+* PDFs
+* Markdown
+* JSON
+* Threat Feeds
+
+### Processing
+
+* Cleaning
+* Parsing
+* Metadata Extraction
+* Classification
+
+### Chunking Strategies
+
+Compare:
+
+* Fixed Chunking
+* Semantic Chunking
+* Hierarchical Chunking
+* Agentic Chunking
+
+Recommend the best strategy.
+
+Provide examples.
+
+---
+
+SECTION 4 — EMBEDDING STRATEGY
+
+Recommend embedding models.
+
+Compare:
+
+* OpenAI text-embedding-3-large
+* BGE-M3
+* E5 Large
+* Nomic Embed
+* Instructor XL
+
+For each provide:
+
+* Accuracy
+* Cost
+* Latency
+* Security use cases
+
+Recommend the best option.
+
+Explain why.
+
+---
+
+SECTION 5 — VECTOR DATABASE DESIGN
+
+Compare:
+
+* Qdrant
+* Pinecone
+* Weaviate
+* ChromaDB
+* Milvus
+
+For each provide:
+
+* Pros
+* Cons
+* Scalability
+* Cost
+* Security
+
+Recommend one for:
+
+Hackathon MVP
+
+and
+
+Enterprise Production
+
+Design the schema.
+
+---
+
+SECTION 6 — HYBRID SEARCH ARCHITECTURE
+
+Design a hybrid retrieval system.
+
+Combine:
+
+* Semantic Search
+* Keyword Search
+* Metadata Filtering
+* Re-ranking
+
+Explain:
+
+How searches should work for:
+
+Example 1:
+"Explain this ransomware alert"
+
+Example 2:
+"Map this incident to MITRE ATT&CK"
+
+Example 3:
+"Recommend CIS controls for this vulnerability"
+
+Provide retrieval workflow diagrams.
+
+---
+
+SECTION 7 — AGENTIC RAG
+
+Design Agentic RAG.
+
+Create specialized retrieval agents:
+
+* Threat Intelligence Retrieval Agent
+* Compliance Retrieval Agent
+* Vulnerability Retrieval Agent
+* Incident History Retrieval Agent
+* Playbook Retrieval Agent
+
+Explain:
+
+* Responsibilities
+* Routing logic
+* Query decomposition
+* Result merging
+
+Provide architecture diagrams.
+
+---
+
+SECTION 8 — SECURITY KNOWLEDGE GRAPH INTEGRATION
+
+Design integration between:
+
+RAG
++
+Knowledge Graph
+
+Show how:
+
+* Threat actors
+* Assets
+* Users
+* Vulnerabilities
+* Incidents
+
+can be linked.
+
+Explain:
+
+How graph retrieval improves investigations.
+
+Provide examples.
+
+---
+
+SECTION 9 — CONTEXT ENGINEERING
+
+Design context assembly.
+
+Explain:
+
+* Context selection
+* Ranking
+* Compression
+* Summarization
+
+Prevent:
+
+* Context overflow
+* Irrelevant retrieval
+* Prompt poisoning
+
+Provide prompt templates.
+
+---
+
+SECTION 10 — RAG SECURITY
+
+Design protections against:
+
+* Prompt Injection
+* Retrieval Poisoning
+* Data Leakage
+* Malicious Documents
+* Hallucinations
+
+Create:
+
+* Validation Layer
+* Trust Scoring Layer
+* Source Verification Layer
+* Response Validation Layer
+
+Provide architecture diagrams.
+
+---
+
+SECTION 11 — SECURITY ANALYST USE CASES
+
+Show how the RAG system handles:
+
+Use Case 1:
+Brute Force Investigation
+
+Use Case 2:
+Ransomware Detection
+
+Use Case 3:
+Cloud Misconfiguration
+
+Use Case 4:
+Compliance Audit
+
+Use Case 5:
+Vulnerability Assessment
+
+For each:
+
+* Retrieval Process
+* Sources Used
+* Agent Interactions
+* Final Output
+
+---
+
+SECTION 12 — FRONTEND EXPERIENCE
+
+Design UI components for:
+
+* Knowledge Search
+* MITRE Explorer
+* Threat Intelligence Portal
+* Compliance Center
+* Investigation Workspace
+
+Provide mock dashboard ideas.
+
+---
+
+SECTION 13 — HACKATHON MVP PLAN
+
+Separate features into:
+
+Tier 1:
+Must Build
+
+Tier 2:
+Build if Time Allows
+
+Tier 3:
+Future Enterprise Version
+
+For each feature provide:
+
+* Estimated effort
+* Demo impact
+* Innovation score impact
+* Technical architecture impact
+
+---
+
+SECTION 14 — IMPLEMENTATION GUIDE
+
+Provide:
+
+Backend Components:
+
+* Services
+* APIs
+* Database tables
+* Vector database schema
+
+Frontend Components:
+
+* Pages
+* Widgets
+* Visualizations
+
+Infrastructure:
+
+* Docker
+* Storage
+* Deployment
+
+---
+
+Goal:
+
+Design a cybersecurity-specific RAG engine that becomes the intelligence layer of SecureFlow AI and makes the platform appear significantly more advanced than traditional chatbot-based security solutions.

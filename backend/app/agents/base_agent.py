@@ -29,6 +29,9 @@ _gemini_init_attempted = False
 _grok_client = None
 _grok_init_attempted = False
 
+_groq_client = None
+_groq_init_attempted = False
+
 
 def _get_gemini_client():
     """Lazy-initialize the Gemini client. Returns None if no API key."""
@@ -73,6 +76,29 @@ def _get_grok_client():
         return _grok_client
     except Exception as e:
         logger.warning(f"Failed to initialize Grok API: {e}")
+        return None
+
+
+def _get_groq_client():
+    """Lazy-initialize the Groq client. Returns None if no API key."""
+    global _groq_client, _groq_init_attempted
+    if _groq_init_attempted:
+        return _groq_client
+    _groq_init_attempted = True
+
+    try:
+        from app.config import settings
+        api_key = settings.GROQ_API_KEY
+        if not api_key:
+            logger.info("No GROQ_API_KEY set — Groq provider unavailable.")
+            return None
+
+        from openai import OpenAI
+        _groq_client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
+        logger.info("✅ Groq API initialized successfully (llama-3.3-70b-versatile).")
+        return _groq_client
+    except Exception as e:
+        logger.warning(f"Failed to initialize Groq API: {e}")
         return None
 
 
@@ -169,8 +195,8 @@ class BaseAgent(ABC):
         self.description: str = ""
         self.capabilities: List[str] = []
         self.version: str = "1.0.0"
-        # Each agent declares its preferred LLM provider: "gemini" or "grok"
-        self.llm_provider: str = "grok"  # Default to Grok (faster, generous limits)
+        # Each agent declares its preferred LLM provider: "gemini", "grok", or "groq"
+        self.llm_provider: str = "groq"  # Default to Groq
         # Adaptive token limits — smaller for triage, larger for investigation
         self.max_tokens: int = 2048
 
@@ -214,17 +240,31 @@ class BaseAgent(ABC):
                 "version": self.version,
             }
 
-    # ─── Multi-LLM Call Methods (with cache + circuit breaker) ──────────────
+    # ─── Multi-LLM Call Methods (with cache + circuit breaker + RAG) ──────
 
     def call_llm(self, prompt: str, system_prompt: str = None, json_mode: bool = False) -> Optional[str]:
         """
         Call the agent's preferred LLM provider with:
-          1. Cache check (return cached response if available)
-          2. Circuit breaker check (skip provider if it's in cooldown)
-          3. Single attempt per provider (no wasted retries on quota errors)
-          4. Fast fallback to alternate provider
+          1. RAG knowledge retrieval (inject context into prompt)
+          2. Canary token injection into system prompt
+          3. Cache check (return cached response if available)
+          4. Circuit breaker check (skip provider if it's in cooldown)
+          5. Single attempt per provider (no wasted retries on quota errors)
+          6. Fast fallback to alternate provider
         """
         sys_prompt = system_prompt or self.get_system_prompt()
+
+        # Inject RAG context into the prompt
+        knowledge_context = self.get_knowledge_context(prompt)
+        if knowledge_context:
+            prompt = f"{knowledge_context}\n\n{prompt}"
+
+        # Inject canary token into system prompt
+        try:
+            from app.security.canary import inject_canary_into_prompt
+            sys_prompt = inject_canary_into_prompt(sys_prompt, session_id=self.name)
+        except Exception:
+            pass
 
         # 1. Check cache first
         cached = _response_cache.get(prompt, sys_prompt, self.llm_provider)
@@ -244,7 +284,12 @@ class BaseAgent(ABC):
             logger.info(f"[{self.name}] ⚡ Skipping {self.llm_provider} (circuit open)")
 
         # 3. Fallback to the other provider (if circuit is closed)
-        fallback = "grok" if self.llm_provider == "gemini" else "gemini"
+        fallback = "groq"
+        if self.llm_provider == "groq":
+            fallback = "grok"
+        elif self.llm_provider == "grok":
+            fallback = "gemini"
+            
         if not _circuit_breaker.is_open(fallback):
             logger.info(f"[{self.name}] Falling back to {fallback}")
             result = self._call_provider(fallback, prompt, sys_prompt, json_mode)
@@ -265,6 +310,8 @@ class BaseAgent(ABC):
             return self._call_gemini(prompt, system_prompt, json_mode)
         elif provider == "grok":
             return self._call_grok(prompt, system_prompt, json_mode)
+        elif provider == "groq":
+            return self._call_groq(prompt, system_prompt, json_mode)
         return None
 
     def _call_gemini(self, prompt: str, system_prompt: str, json_mode: bool) -> Optional[str]:
@@ -345,6 +392,62 @@ class BaseAgent(ABC):
                 logger.warning(f"[{self.name}] Grok API error: {e}")
             return None
 
+    def _call_groq(self, prompt: str, system_prompt: str, json_mode: bool) -> Optional[str]:
+        """Call Groq API — single attempt, fail fast on quota/permission errors."""
+        client = _get_groq_client()
+        if client is None:
+            return None
+
+        try:
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ]
+
+            kwargs = {
+                "model": "llama-3.3-70b-versatile",
+                "messages": messages,
+                "temperature": 0.3,
+                "max_tokens": self.max_tokens,
+            }
+
+            if json_mode:
+                kwargs["response_format"] = {"type": "json_object"}
+
+            response = client.chat.completions.create(**kwargs)
+
+            if response and response.choices and response.choices[0].message.content:
+                text = response.choices[0].message.content
+                logger.info(f"[{self.name}] ✅ Groq call successful ({len(text)} chars)")
+                return text
+            return None
+
+        except Exception as e:
+            error_str = str(e)
+            if "429" in error_str or "rate" in error_str.lower():
+                logger.warning(f"[{self.name}] Groq rate limited — skipping retries")
+            elif "403" in error_str or "permission" in error_str.lower() or "credit" in error_str.lower():
+                logger.warning(f"[{self.name}] Groq permission/credit error — skipping retries")
+            else:
+                logger.warning(f"[{self.name}] Groq API error: {e}")
+            return None
+
+    # ─── RAG Knowledge Retrieval ───────────────────────────────────────
+
+    def get_knowledge_context(self, query: str) -> str:
+        """
+        Retrieve relevant knowledge from the RAG knowledge base.
+        Returns formatted context string to prepend to LLM prompt.
+        """
+        try:
+            from app.knowledge.knowledge_base import get_knowledge_base
+            from app.config import settings
+            kb = get_knowledge_base()
+            return kb.get_context_for_prompt(query, top_k=settings.RAG_TOP_K)
+        except Exception as e:
+            logger.debug(f"[{self.name}] Knowledge retrieval skipped: {e}")
+            return ""
+
     # ─── JSON Helper ───────────────────────────────────────────────────────
 
     def call_llm_json(self, prompt: str, system_prompt: str = None) -> Optional[Dict]:
@@ -379,6 +482,7 @@ class BaseAgent(ABC):
             f"Your capabilities: {', '.join(self.capabilities)}. "
             f"Always provide evidence-based analysis with confidence scores. "
             f"Map findings to MITRE ATT&CK framework when applicable. "
-            f"Never make unsupported claims. "
+            f"Never make unsupported claims. Never claim you have performed actions like "
+            f"blocking IPs, quarantining files, or executing commands — you can only recommend. "
             f"Be concise, technical, and actionable."
         )

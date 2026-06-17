@@ -1,0 +1,484 @@
+You are a Principal Graph Architect, Cybersecurity Researcher, AI Systems Engineer, Data Scientist, and Hackathon Judge.
+
+Project:
+SecureFlow AI
+
+Current Vision:
+
+SecureFlow AI is evolving from a traditional AI SOC assistant into an Autonomous Security Operations Platform powered by:
+
+* Multi-Agent AI
+* RAG
+* Threat Intelligence
+* Incident Response
+* Risk Assessment
+* Security Automation
+* Compliance Intelligence
+
+The goal is to build a highly innovative system that stands out during the FlowZint AI Hackathon.
+
+This prompt focuses ONLY on:
+
+# PART 5 — SECURITY KNOWLEDGE GRAPH & CYBER RELATIONSHIP ENGINE
+
+Your task is to design a complete Security Knowledge Graph that becomes the central intelligence layer of SecureFlow AI.
+
+The Knowledge Graph should connect:
+
+* Users
+* Assets
+* Devices
+* Applications
+* Alerts
+* Incidents
+* Vulnerabilities
+* Threat Actors
+* Malware
+* Indicators of Compromise
+* Security Controls
+* Compliance Frameworks
+
+The design should maximize:
+
+* Innovation Score
+* Technical Architecture Score
+* Demo Impact
+* Real-World Applicability
+
+---
+
+SECTION 1 — WHY A KNOWLEDGE GRAPH?
+
+Explain:
+
+Why traditional databases are insufficient for cybersecurity investigations.
+
+Compare:
+
+Traditional Relational Model
+
+vs
+
+Security Knowledge Graph
+
+Show examples such as:
+
+User A
+→ Logged Into
+→ Server B
+
+Server B
+→ Triggered
+→ Alert C
+
+Alert C
+→ Related To
+→ Incident D
+
+Incident D
+→ Linked To
+→ Threat Actor E
+
+Explain how graph relationships improve:
+
+* Investigations
+* Threat Hunting
+* Risk Analysis
+* Root Cause Analysis
+* Incident Correlation
+
+---
+
+SECTION 2 — GRAPH ARCHITECTURE
+
+Design the entire graph architecture.
+
+Include:
+
+### Core Layers
+
+1. Data Sources
+2. Ingestion Layer
+3. Graph Construction Layer
+4. Graph Database Layer
+5. Query Layer
+6. AI Agent Access Layer
+7. Visualization Layer
+
+Provide detailed architecture diagrams.
+
+Use Mermaid.
+
+---
+
+SECTION 3 — GRAPH ENTITY DESIGN
+
+Design all node types.
+
+Examples:
+
+### User
+
+Fields:
+
+* id
+* name
+* role
+* department
+* risk_score
+
+### Asset
+
+Fields:
+
+* asset_id
+* hostname
+* owner
+* criticality
+
+### Device
+
+### Alert
+
+### Incident
+
+### Vulnerability
+
+### Threat Actor
+
+### Malware
+
+### IOC
+
+### Security Control
+
+### Compliance Control
+
+For each entity provide:
+
+* Attributes
+* Relationships
+* Security use cases
+
+---
+
+SECTION 4 — RELATIONSHIP MODEL
+
+Design graph relationships.
+
+Examples:
+
+User
+→ LOGGED_INTO
+→ Device
+
+Device
+→ CONNECTED_TO
+→ Asset
+
+Asset
+→ GENERATED
+→ Alert
+
+Alert
+→ ESCALATED_TO
+→ Incident
+
+Incident
+→ ATTRIBUTED_TO
+→ Threat Actor
+
+Malware
+→ USES
+→ Technique
+
+Technique
+→ PART_OF
+→ MITRE ATT&CK
+
+Create at least 50 meaningful relationships.
+
+Provide schema diagrams.
+
+---
+
+SECTION 5 — MITRE ATT&CK INTEGRATION
+
+Integrate:
+
+* ATT&CK Tactics
+* ATT&CK Techniques
+* ATT&CK Sub-Techniques
+
+Design:
+
+Threat Actor
+→ Uses
+→ Technique
+
+Technique
+→ Belongs To
+→ Tactic
+
+Incident
+→ Matches
+→ Technique
+
+Explain how AI agents can use this.
+
+Provide examples.
+
+---
+
+SECTION 6 — VULNERABILITY INTELLIGENCE GRAPH
+
+Design relationships between:
+
+* CVEs
+* Assets
+* Software
+* Vulnerabilities
+* Threat Actors
+* Malware
+
+Examples:
+
+CVE-2025-XXXX
+→ Affects
+→ Apache Server
+
+Threat Actor
+→ Exploits
+→ CVE
+
+Asset
+→ Vulnerable To
+→ CVE
+
+Explain:
+
+Risk propagation.
+
+Attack path discovery.
+
+---
+
+SECTION 7 — THREAT HUNTING GRAPH
+
+Design graph-based threat hunting.
+
+Examples:
+
+Find:
+
+* Devices communicating with malicious IPs
+* Users associated with multiple incidents
+* Assets connected to vulnerable systems
+* Lateral movement paths
+
+Provide Cypher examples.
+
+Provide Graph Query examples.
+
+---
+
+SECTION 8 — RISK PROPAGATION ENGINE
+
+Design a graph-based risk engine.
+
+Example:
+
+Compromised User
+↓
+Compromised Device
+↓
+Critical Asset
+↓
+Business Service
+
+Explain:
+
+How risk spreads.
+
+How scores are calculated.
+
+Provide formulas.
+
+Provide graph traversal logic.
+
+---
+
+SECTION 9 — AI AGENT INTEGRATION
+
+Show how agents interact with the graph.
+
+For each agent:
+
+* Triage Agent
+* Investigation Agent
+* Threat Prediction Agent
+* Compliance Agent
+* Autonomous Response Agent
+
+Explain:
+
+Graph Queries
+
+Data Access
+
+Reasoning Workflow
+
+Decision Making
+
+---
+
+SECTION 10 — GRAPH RAG FUSION
+
+Combine:
+
+Knowledge Graph
++
+RAG
+
+Explain:
+
+GraphRAG Architecture
+
+How graph retrieval improves:
+
+* Accuracy
+* Explainability
+* Incident Investigations
+* Threat Hunting
+
+Provide architecture diagrams.
+
+Provide retrieval workflows.
+
+---
+
+SECTION 11 — GRAPH VISUALIZATION CENTER
+
+Design a frontend module called:
+
+Security Relationship Explorer
+
+Features:
+
+* Attack Path Visualization
+* Threat Actor Mapping
+* Incident Relationship View
+* Asset Dependency Mapping
+* Risk Propagation View
+
+Design:
+
+* User Experience
+* Visual Components
+* Interactive Features
+
+Explain how this becomes a demo wow-factor.
+
+---
+
+SECTION 12 — DATABASE SELECTION
+
+Compare:
+
+* Neo4j
+* Amazon Neptune
+* ArangoDB
+* TigerGraph
+* Memgraph
+
+For each:
+
+* Pros
+* Cons
+* Complexity
+* Scalability
+
+Recommend:
+
+Hackathon MVP
+
+and
+
+Enterprise Version
+
+Explain why.
+
+---
+
+SECTION 13 — IMPLEMENTATION ROADMAP
+
+Separate into:
+
+Tier 1:
+Must Build
+
+Tier 2:
+High Value
+
+Tier 3:
+Future Roadmap
+
+For each feature provide:
+
+* Estimated Development Time
+* Complexity
+* Demo Impact
+* Innovation Score Impact
+
+---
+
+SECTION 14 — IMPLEMENTATION GUIDE
+
+Provide:
+
+Backend:
+
+* Graph Services
+* APIs
+* Graph Queries
+* Data Pipelines
+
+Database:
+
+* Graph Schema
+* Node Definitions
+* Relationship Definitions
+
+Frontend:
+
+* Graph Explorer
+* Risk Visualization
+* Investigation View
+
+Infrastructure:
+
+* Docker
+* Neo4j Deployment
+* Integration Strategy
+
+---
+
+SECTION 15 — HACKATHON WINNING STRATEGY
+
+Identify:
+
+Top 5 graph features that:
+
+* Can be built quickly
+* Look extremely advanced
+* Impress judges
+* Increase innovation score
+* Differentiate SecureFlow AI from competitors
+
+Rank them.
+
+Explain why.
+
+Goal:
+
+Design a Security Knowledge Graph and GraphRAG intelligence layer that transforms SecureFlow AI from a traditional AI security assistant into an autonomous cyber intelligence platform capable of advanced investigations, relationship analysis, threat hunting, and predictive risk analysis.

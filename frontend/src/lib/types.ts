@@ -159,3 +159,53 @@ export interface DashboardData {
   top_attack_types: { type: string; count: number }[];
   severity_distribution: Record<string, number>;
 }
+
+export interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  severity: string;
+  category: string;
+  is_read: boolean;
+  related_alert_id?: number;
+  related_incident_id?: number;
+  created_at?: string;
+}
+
+export interface IngestionStatus {
+  running: boolean;
+  log_dir: string;
+  interval_seconds: number;
+  simulator: {
+    lines_written: number;
+    attack_events: number;
+    running: boolean;
+  };
+  events_ingested: number;
+  alerts_created: number;
+  errors: number;
+  last_ingestion?: string;
+  started_at?: string;
+}
+
+export interface HealthCheck {
+  status: string;
+  service: string;
+  version: string;
+  components: {
+    knowledge_base: {
+      status: string;
+      documents: number;
+    };
+    ingestion: {
+      status: string;
+      events_ingested: number;
+    };
+    security: {
+      prompt_injection: string;
+      output_validation: string;
+      canary_tokens: string;
+      policy_engine: string;
+    };
+  };
+}

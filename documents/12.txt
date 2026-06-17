@@ -1,0 +1,532 @@
+You are a Principal Technical Writer, Open Source Maintainer, Developer Advocate, Product Marketing Expert, GitHub Reviewer, and Hackathon Judge.
+
+Project:
+SecureFlow AI
+
+Current Vision:
+
+SecureFlow AI is an Autonomous Security Operations Platform powered by:
+
+* Multi-Agent AI
+* Security Knowledge Graph
+* GraphRAG
+* Organizational Memory
+* Threat Intelligence
+* Risk Prediction
+* Compliance Intelligence
+* Autonomous Response Engine
+* Executive Security Dashboard
+
+Hackathon:
+
+FlowZint AI Hackathon 2026
+
+Evaluation Criteria:
+
+* Model Innovation & Novelty (30%)
+* Real-World Applicability (25%)
+* Technical Architecture (25%)
+* Documentation Clarity (20%)
+
+This prompt focuses ONLY on:
+
+# PART 10 — DOCUMENTATION, REPOSITORY DESIGN & SUBMISSION PACKAGE
+
+Your task is to create a complete documentation strategy and submission package that maximizes the Documentation Clarity score and makes SecureFlow AI appear highly professional, enterprise-grade, and easy for judges to evaluate.
+
+The goal is to ensure judges can understand the value, architecture, innovation, and implementation of SecureFlow AI within minutes.
+
+---
+
+SECTION 1 — DOCUMENTATION REVIEW
+
+Act as a hackathon judge.
+
+Explain:
+
+* Why many technically strong projects lose points due to poor documentation.
+* What judges look for first in a GitHub repository.
+* What makes documentation memorable.
+* Common mistakes teams make.
+
+Provide examples.
+
+---
+
+SECTION 2 — COMPLETE REPOSITORY STRUCTURE
+
+Design a professional repository structure.
+
+Example:
+
+/docs
+/architecture
+/backend
+/frontend
+/screenshots
+/demo
+/tests
+/scripts
+
+Provide:
+
+* Folder purpose
+* Contents
+* Documentation standards
+
+Explain how this improves judge experience.
+
+---
+
+SECTION 3 — README DESIGN
+
+Create a world-class README structure.
+
+Include:
+
+### Hero Section
+
+* Project name
+* Tagline
+* Demo GIF
+* Key value proposition
+
+### Problem Statement
+
+### Solution Overview
+
+### Architecture Diagram
+
+### Features
+
+### AI Agents
+
+### Security Knowledge Graph
+
+### GraphRAG
+
+### Memory System
+
+### Autonomous Response
+
+### Executive Dashboard
+
+### Screenshots
+
+### Demo Workflow
+
+### Installation
+
+### API Documentation
+
+### Future Roadmap
+
+### Team Information
+
+Provide detailed content recommendations.
+
+---
+
+SECTION 4 — README CONTENT GENERATION
+
+Write a complete professional README.md.
+
+Include:
+
+* Executive summary
+* Feature descriptions
+* Architecture overview
+* Technology stack
+* AI innovation highlights
+* Business value
+* Security safeguards
+
+The README should be ready for GitHub publication.
+
+Use professional formatting.
+
+---
+
+SECTION 5 — ARCHITECTURE DOCUMENTATION
+
+Create ARCHITECTURE.md.
+
+Include:
+
+### High-Level Architecture
+
+### Multi-Agent System
+
+### RAG Architecture
+
+### Knowledge Graph Architecture
+
+### Memory Architecture
+
+### Security Architecture
+
+### Deployment Architecture
+
+Provide Mermaid diagrams.
+
+Provide explanations.
+
+---
+
+SECTION 6 — API DOCUMENTATION
+
+Create API.md.
+
+Document:
+
+### Authentication APIs
+
+### Alert APIs
+
+### Incident APIs
+
+### Ticket APIs
+
+### Agent APIs
+
+### Graph APIs
+
+### Memory APIs
+
+### Threat Intelligence APIs
+
+### Reporting APIs
+
+For every endpoint provide:
+
+* Method
+* URL
+* Request
+* Response
+* Example payloads
+
+Provide professional API documentation.
+
+---
+
+SECTION 7 — AGENT DOCUMENTATION
+
+Create AGENTS.md.
+
+For every AI agent explain:
+
+* Purpose
+* Inputs
+* Outputs
+* Decision logic
+* Interactions with other agents
+
+Provide diagrams.
+
+Show orchestration flows.
+
+---
+
+SECTION 8 — KNOWLEDGE GRAPH DOCUMENTATION
+
+Create GRAPH.md.
+
+Explain:
+
+* Graph schema
+* Nodes
+* Relationships
+* Queries
+* Risk propagation
+
+Provide examples.
+
+Provide visual diagrams.
+
+---
+
+SECTION 9 — MEMORY DOCUMENTATION
+
+Create MEMORY.md.
+
+Explain:
+
+* Working memory
+* Incident memory
+* Organizational memory
+* Threat memory
+
+Provide architecture.
+
+Provide retrieval workflows.
+
+Provide examples.
+
+---
+
+SECTION 10 — SECURITY DOCUMENTATION
+
+Create SECURITY.md.
+
+Document:
+
+### Prompt Injection Defense
+
+### RAG Security
+
+### Data Protection
+
+### Agent Permissions
+
+### Audit Logging
+
+### Autonomous Response Guardrails
+
+Map protections to:
+
+* OWASP LLM Top 10
+* MITRE ATT&CK
+* NIST
+
+Provide explanations.
+
+---
+
+SECTION 11 — INSTALLATION GUIDE
+
+Create INSTALL.md.
+
+Provide:
+
+### Local Setup
+
+### Docker Setup
+
+### Environment Variables
+
+### Backend Setup
+
+### Frontend Setup
+
+### Database Setup
+
+### Running the System
+
+### Troubleshooting
+
+Provide exact commands.
+
+Make onboarding easy.
+
+---
+
+SECTION 12 — DEMO DOCUMENTATION
+
+Create DEMO.md.
+
+Document:
+
+### Demo Scenario
+
+### Attack Simulation
+
+### Agent Investigation
+
+### Knowledge Graph
+
+### Memory Recall
+
+### Risk Prediction
+
+### Autonomous Response
+
+### Executive Dashboard
+
+Provide:
+
+* Screens to show
+* Narration
+* Expected outputs
+
+Provide demo instructions.
+
+---
+
+SECTION 13 — SCREENSHOT STRATEGY
+
+Identify:
+
+The top screenshots required.
+
+Examples:
+
+* Executive Dashboard
+* Investigation Workspace
+* Knowledge Graph Explorer
+* Memory Center
+* Threat Intelligence Portal
+* Autonomous Response Center
+
+For each screenshot explain:
+
+* What should be visible
+* Why it matters
+* Judge perception
+
+---
+
+SECTION 14 — VIDEO DEMO STRATEGY
+
+Create a 3–5 minute video plan.
+
+Include:
+
+### Intro
+
+### Problem
+
+### Solution
+
+### Live Demo
+
+### Architecture
+
+### Future Vision
+
+Provide:
+
+* Timeline
+* Narration
+* Screen transitions
+
+Explain how to maximize impact.
+
+---
+
+SECTION 15 — SUBMISSION FORM CONTENT
+
+Write content for:
+
+### Project Description
+
+### Problem Statement
+
+### Solution Summary
+
+### Innovation Summary
+
+### Technical Architecture Summary
+
+### Real-World Applicability Summary
+
+### Future Scope
+
+Optimize responses for hackathon judges.
+
+---
+
+SECTION 16 — PRESENTATION DECK DOCUMENTATION
+
+Design:
+
+10-slide pitch deck.
+
+Slides:
+
+1. Problem
+2. Market Need
+3. Solution
+4. Architecture
+5. AI Agents
+6. Graph Intelligence
+7. Memory System
+8. Demo
+9. Impact
+10. Roadmap
+
+Provide detailed slide content.
+
+---
+
+SECTION 17 — JUDGE QUICK START GUIDE
+
+Create JUDGES.md.
+
+Goal:
+
+Allow judges to understand SecureFlow AI within 5 minutes.
+
+Include:
+
+* Project Overview
+* Key Innovations
+* Demo Flow
+* Architecture Highlights
+* Evaluation Criteria Mapping
+
+Explain why this document is valuable.
+
+---
+
+SECTION 18 — DOCUMENTATION AUTOMATION
+
+Recommend tools for:
+
+* Diagram generation
+* API documentation
+* README badges
+* Architecture visualization
+* Changelog generation
+
+Explain setup.
+
+---
+
+SECTION 19 — DOCUMENTATION PRIORITIZATION
+
+Separate documentation into:
+
+Tier 1:
+Must Have
+
+Tier 2:
+High Value
+
+Tier 3:
+Optional
+
+For each provide:
+
+* Effort
+* Impact
+* Judge value
+
+---
+
+SECTION 20 — FINAL HACKATHON SUBMISSION PACKAGE
+
+Design the exact package that should be submitted.
+
+Include:
+
+Repository Contents
+
+Required Documents
+
+Screenshots
+
+Architecture Diagrams
+
+Video Demo
+
+Presentation Deck
+
+Submission Form Content
+
+Judge Guide
+
+Provide a final checklist.
+
+Goal:
+
+Create a complete, professional, enterprise-grade documentation and submission package that maximizes documentation scores and allows judges to immediately understand the innovation, architecture, and business value of SecureFlow AI.

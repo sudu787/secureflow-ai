@@ -1,0 +1,542 @@
+You are a Principal AI Security Researcher, Red Team Lead, Application Security Architect, LLM Security Expert, SOC Manager, and Hackathon Judge.
+
+Project:
+SecureFlow AI
+
+Current Vision:
+
+SecureFlow AI is an Autonomous Security Operations Platform powered by:
+
+* Multi-Agent AI
+* Security Knowledge Graph
+* GraphRAG
+* Organizational Memory
+* Threat Intelligence
+* Risk Prediction
+* Compliance Intelligence
+* Autonomous Response Engine
+* Executive Security Dashboard
+
+Current Security Features:
+
+* Prompt Injection Detection
+* Output Validation
+* Policy Engine
+* Audit Logging
+* Multi-LLM Support
+* Agent Orchestration
+* Incident Response Workflows
+
+Hackathon:
+
+FlowZint AI Hackathon 2026
+
+Evaluation Criteria:
+
+* Model Innovation & Novelty (30%)
+* Real-World Applicability (25%)
+* Technical Architecture (25%)
+* Documentation Clarity (20%)
+
+This prompt focuses ONLY on:
+
+# PART 11 — SECURITY VALIDATION, AI SAFETY, RED TEAMING & TRUST ARCHITECTURE
+
+Your task is to perform a complete security review of SecureFlow AI and design an enterprise-grade AI security and trust framework.
+
+The objective is to demonstrate that SecureFlow AI is not only intelligent, but also secure, trustworthy, explainable, and resistant to attacks.
+
+The output should help maximize:
+
+* Technical Architecture Score
+* Innovation Score
+* Real-World Applicability
+* Judge Confidence
+
+---
+
+SECTION 1 — THREAT MODEL
+
+Create a complete threat model.
+
+Identify:
+
+### External Attackers
+
+### Insider Threats
+
+### Malicious Users
+
+### Compromised Agents
+
+### Supply Chain Risks
+
+### Data Poisoning Risks
+
+### RAG Poisoning Risks
+
+### Autonomous Response Risks
+
+For each threat provide:
+
+* Attack Description
+* Impact
+* Likelihood
+* Risk Level
+* Mitigation
+
+Use STRIDE methodology.
+
+Provide diagrams.
+
+---
+
+SECTION 2 — OWASP LLM TOP 10 ANALYSIS
+
+Evaluate SecureFlow AI against:
+
+* LLM01 Prompt Injection
+* LLM02 Sensitive Information Disclosure
+* LLM03 Supply Chain
+* LLM04 Data and Model Poisoning
+* LLM05 Improper Output Handling
+* LLM06 Excessive Agency
+* LLM07 System Prompt Leakage
+* LLM08 Vector and Embedding Weaknesses
+* LLM09 Misinformation
+* LLM10 Unbounded Consumption
+
+For each:
+
+* Attack scenario
+* Impact
+* Detection
+* Prevention
+* Recommended implementation
+
+Provide examples.
+
+---
+
+SECTION 3 — PROMPT INJECTION DEFENSE
+
+Design a comprehensive defense system.
+
+Protect against:
+
+* Ignore previous instructions
+* DAN-style jailbreaks
+* System prompt extraction
+* Role confusion
+* Hidden instructions
+* Context poisoning
+
+Design:
+
+### Input Filter
+
+### Prompt Firewall
+
+### Trust Scoring
+
+### Context Sanitization
+
+### Agent Verification
+
+Provide architecture.
+
+Provide detection logic.
+
+Provide implementation recommendations.
+
+---
+
+SECTION 4 — RAG SECURITY
+
+Design protections for:
+
+### Retrieval Poisoning
+
+### Malicious Documents
+
+### Prompt Injection in Documents
+
+### Fake Threat Intelligence
+
+### Tampered Security Playbooks
+
+Create:
+
+* Source Verification Layer
+* Trust Scoring Layer
+* Content Sanitization Layer
+* Retrieval Validation Layer
+
+Provide architecture diagrams.
+
+---
+
+SECTION 5 — MEMORY SECURITY
+
+Protect:
+
+* Organizational Memory
+* Incident Memory
+* Threat Memory
+* Compliance Memory
+
+Against:
+
+* Memory Poisoning
+* Unauthorized Access
+* False Historical Data
+* Data Leakage
+
+Design:
+
+* Access Controls
+* Trust Scoring
+* Memory Validation
+* Memory Encryption
+
+Provide architecture.
+
+---
+
+SECTION 6 — KNOWLEDGE GRAPH SECURITY
+
+Protect the graph from:
+
+* Relationship Poisoning
+* Fake Nodes
+* Fake Threat Intelligence
+* Malicious Correlations
+
+Design:
+
+* Validation Pipelines
+* Confidence Scores
+* Source Verification
+
+Explain implementation.
+
+---
+
+SECTION 7 — AGENT SECURITY
+
+Design agent-level security.
+
+Protect:
+
+### Triage Agent
+
+### Investigation Agent
+
+### Remediation Agent
+
+### Threat Prediction Agent
+
+### Compliance Agent
+
+### Autonomous Response Agent
+
+For each:
+
+* Risks
+* Privileges
+* Restrictions
+* Safety Checks
+
+Provide RBAC model.
+
+---
+
+SECTION 8 — AUTONOMOUS RESPONSE SAFETY
+
+Design guardrails for:
+
+* User Lockouts
+* Firewall Changes
+* Account Suspension
+* Asset Isolation
+* System Shutdown
+
+Implement:
+
+### Human Approval Mode
+
+### Risk-Aware Mode
+
+### Emergency Mode
+
+### Rollback Mode
+
+Provide workflow diagrams.
+
+Provide approval matrices.
+
+---
+
+SECTION 9 — HALLUCINATION CONTROL
+
+Design anti-hallucination systems.
+
+Examples:
+
+AI inventing:
+
+* CVEs
+* Threat actors
+* Incidents
+* MITRE mappings
+
+Create:
+
+### Evidence Validation
+
+### Source Attribution
+
+### Confidence Scoring
+
+### Fact Verification
+
+Provide implementation architecture.
+
+---
+
+SECTION 10 — EXPLAINABLE AI
+
+Design explainability mechanisms.
+
+For every AI decision provide:
+
+* Why
+* Evidence
+* Sources
+* Confidence
+* Memory references
+* Graph references
+
+Provide UI concepts.
+
+Explain trust benefits.
+
+---
+
+SECTION 11 — AI EVALUATION FRAMEWORK
+
+Create evaluation metrics.
+
+Measure:
+
+### Agent Accuracy
+
+### Incident Classification Accuracy
+
+### MITRE Mapping Accuracy
+
+### RAG Retrieval Quality
+
+### Risk Prediction Quality
+
+### Response Recommendation Quality
+
+Provide scoring formulas.
+
+Provide benchmark strategies.
+
+---
+
+SECTION 12 — RED TEAMING FRAMEWORK
+
+Design a red team program.
+
+Create tests for:
+
+### Prompt Injection
+
+### Jailbreak Attempts
+
+### Agent Manipulation
+
+### Memory Poisoning
+
+### RAG Poisoning
+
+### Graph Poisoning
+
+### Autonomous Response Abuse
+
+Provide:
+
+* Attack payloads
+* Expected behavior
+* Success criteria
+
+Create a testing methodology.
+
+---
+
+SECTION 13 — SECURITY TEST SUITE
+
+Create:
+
+### Unit Tests
+
+### Integration Tests
+
+### Agent Tests
+
+### RAG Tests
+
+### Graph Tests
+
+### Memory Tests
+
+### API Security Tests
+
+Provide example test cases.
+
+Provide automation strategy.
+
+---
+
+SECTION 14 — COMPLIANCE & GOVERNANCE
+
+Map SecureFlow AI to:
+
+* ISO 27001
+* NIST CSF
+* SOC2
+* CIS Controls
+
+Explain:
+
+* Controls implemented
+* Auditability
+* Logging
+* Traceability
+
+Provide mappings.
+
+---
+
+SECTION 15 — TRUST DASHBOARD
+
+Design a new dashboard:
+
+AI Trust & Security Center
+
+Features:
+
+* Prompt Injection Attempts
+* Agent Confidence
+* Hallucination Rate
+* Memory Integrity
+* RAG Trust Scores
+* Graph Integrity Scores
+
+Provide UI concepts.
+
+Explain demo value.
+
+---
+
+SECTION 16 — SECURITY ARCHITECTURE DIAGRAMS
+
+Create diagrams for:
+
+### Secure Agent Architecture
+
+### Secure RAG Architecture
+
+### Secure Memory Architecture
+
+### Secure Knowledge Graph Architecture
+
+### Secure Autonomous Response Architecture
+
+Use Mermaid.
+
+Provide explanations.
+
+---
+
+SECTION 17 — HACKATHON MVP SECURITY
+
+Separate into:
+
+Tier 1:
+Must Implement
+
+Tier 2:
+High Value
+
+Tier 3:
+Future Enterprise Controls
+
+For each control provide:
+
+* Effort
+* Complexity
+* Demo impact
+* Judge impact
+
+---
+
+SECTION 18 — SECURITY DIFFERENTIATORS
+
+Identify the top 10 security innovations that differentiate SecureFlow AI from standard AI chatbots and SOC assistants.
+
+Rank them.
+
+Explain why they matter.
+
+---
+
+SECTION 19 — JUDGE Q&A PREPARATION
+
+Prepare answers for questions such as:
+
+* How do you prevent prompt injection?
+* How do you secure RAG?
+* How do you prevent hallucinations?
+* How do you secure autonomous actions?
+* Why should enterprises trust SecureFlow AI?
+
+Provide concise and professional responses.
+
+---
+
+SECTION 20 — FINAL SECURITY REVIEW
+
+Act as:
+
+* CISO
+* Security Architect
+* AI Security Researcher
+* Hackathon Judge
+
+Evaluate SecureFlow AI.
+
+Provide:
+
+### Security Score
+
+### Architecture Score
+
+### Trust Score
+
+### Enterprise Readiness Score
+
+### Major Strengths
+
+### Major Weaknesses
+
+### Recommended Improvements
+
+### Competitive Differentiators
+
+Goal:
+
+Design a complete AI security, trust, governance, and validation framework that proves SecureFlow AI is secure, explainable, auditable, and enterprise-ready while maximizing hackathon judging scores.

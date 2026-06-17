@@ -1,0 +1,444 @@
+You are a Principal Cloud Architect, AI Systems Engineer, Security Architect, and Hackathon Judge.
+
+Project:
+SecureFlow AI
+
+Current Technology Stack:
+
+Frontend:
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+
+Backend:
+
+* FastAPI
+* Python
+
+Database:
+
+* SQLite (can be upgraded)
+
+Current Features:
+
+* Multi-Agent Architecture
+* SOC Dashboard
+* Alert Management
+* Incident Management
+* Ticketing
+* AI Chat
+* Reporting
+* Prompt Injection Protection
+* Policy Engine
+* Output Validation
+* Audit Logging
+* Multi-LLM Support
+
+Hackathon Evaluation Criteria:
+
+1. Model Innovation & Novelty (30%)
+2. Real-World Applicability (25%)
+3. Technical Architecture (25%)
+4. Documentation Clarity (20%)
+
+This prompt focuses ONLY on:
+
+# PART 3 — TECHNICAL ARCHITECTURE REDESIGN
+
+Your task is to redesign SecureFlow AI into an enterprise-grade autonomous security operations platform with a highly impressive architecture suitable for a hackathon-winning project.
+
+---
+
+SECTION 1 — CURRENT ARCHITECTURE REVIEW
+
+Analyze the current architecture.
+
+For each layer evaluate:
+
+* Frontend
+* Backend
+* Database
+* Agent Framework
+* Security Layer
+* API Layer
+
+For every component provide:
+
+* Strengths
+* Weaknesses
+* Scalability limitations
+* Enterprise readiness
+* Security considerations
+
+Identify what hackathon judges would consider ordinary vs innovative.
+
+---
+
+SECTION 2 — TARGET ARCHITECTURE
+
+Design a complete future-state architecture.
+
+Include:
+
+### User Layer
+
+* Security Analyst
+* IT Team
+* Executives
+* Employees
+* Administrators
+
+### Application Layer
+
+* Dashboard
+* Incident Center
+* AI Chat
+* Reporting Portal
+* Risk Center
+* Threat Intelligence Center
+* Compliance Center
+
+### Agent Layer
+
+Include all agents from Part 2.
+
+Explain:
+
+* Responsibilities
+* Communication patterns
+* Agent hierarchy
+
+### Intelligence Layer
+
+Include:
+
+* RAG Engine
+* Memory Engine
+* Knowledge Graph
+* Threat Intelligence Engine
+* Risk Scoring Engine
+
+### Data Layer
+
+Include:
+
+* PostgreSQL
+* Redis
+* Vector Database
+* Object Storage
+
+### AI Layer
+
+Include:
+
+* Groq
+* Gemini
+* OpenAI
+* Claude
+
+Design:
+
+* Routing strategy
+* Failover logic
+* Cost optimization
+
+---
+
+SECTION 3 — MICROSERVICE ARCHITECTURE
+
+Break SecureFlow AI into microservices.
+
+Example:
+
+* Alert Service
+* Incident Service
+* Ticket Service
+* AI Service
+* Knowledge Graph Service
+* Memory Service
+* RAG Service
+* Reporting Service
+* Notification Service
+
+For each microservice provide:
+
+* Responsibilities
+* APIs
+* Database ownership
+* Communication method
+
+Explain:
+
+* Service boundaries
+* Event flows
+* Failure handling
+
+---
+
+SECTION 4 — EVENT-DRIVEN ARCHITECTURE
+
+Design an event-driven system.
+
+Use:
+
+* Redis Streams
+* Kafka
+* RabbitMQ
+
+Choose the best architecture.
+
+Explain:
+
+Events such as:
+
+* Alert Created
+* Incident Created
+* Ticket Created
+* Threat Detected
+* Response Approved
+* Compliance Violation
+
+Show:
+
+* Publishers
+* Subscribers
+* Event payloads
+
+Provide architecture diagrams.
+
+---
+
+SECTION 5 — RAG ARCHITECTURE
+
+Design a production-grade RAG system.
+
+Knowledge Sources:
+
+* MITRE ATT&CK
+* OWASP
+* NIST
+* CIS Controls
+* Security Playbooks
+* Internal Documentation
+* Incident History
+
+For the RAG system provide:
+
+### Ingestion Pipeline
+
+* Parsing
+* Chunking
+* Embeddings
+* Metadata
+
+### Retrieval Layer
+
+* Hybrid Search
+* Semantic Search
+* Re-ranking
+
+### Generation Layer
+
+* Context Assembly
+* Prompt Construction
+* Response Validation
+
+Recommend:
+
+* Embedding models
+* Vector database
+* Storage architecture
+
+Provide diagrams.
+
+---
+
+SECTION 6 — KNOWLEDGE GRAPH ARCHITECTURE
+
+Design a Security Knowledge Graph.
+
+Nodes:
+
+* Users
+* Devices
+* Assets
+* Alerts
+* Incidents
+* Vulnerabilities
+* Threat Actors
+* Malware
+* IOCs
+
+Relationships:
+
+* Logged Into
+* Triggered
+* Communicated With
+* Affected By
+* Connected To
+
+Explain:
+
+* Graph schema
+* Storage options
+* Query architecture
+
+Provide examples.
+
+Show how agents use the graph.
+
+---
+
+SECTION 7 — MEMORY ARCHITECTURE
+
+Design:
+
+### Short-Term Memory
+
+### Session Memory
+
+### Incident Memory
+
+### Long-Term Organizational Memory
+
+Explain:
+
+* Storage mechanisms
+* Retrieval process
+* Update process
+
+Recommend:
+
+* Redis
+* PostgreSQL
+* Qdrant
+* ChromaDB
+
+Show memory lifecycle diagrams.
+
+---
+
+SECTION 8 — SECURITY ARCHITECTURE
+
+Design defense mechanisms for:
+
+* Prompt Injection
+* Data Leakage
+* Jailbreak Attempts
+* Agent Manipulation
+* Hallucinations
+* Unauthorized Actions
+
+Include:
+
+* Input Validation
+* Output Validation
+* Policy Engine
+* Permission Model
+* Audit Logging
+
+Provide layered security architecture.
+
+---
+
+SECTION 9 — DATABASE DESIGN
+
+Design a production schema.
+
+Tables:
+
+* Users
+* Alerts
+* Incidents
+* Tickets
+* Agent Actions
+* Threat Intelligence
+* Knowledge Graph References
+* Memory Records
+* Compliance Records
+
+For each table provide:
+
+* Fields
+* Relationships
+* Indexes
+
+---
+
+SECTION 10 — API ARCHITECTURE
+
+Design REST APIs for:
+
+* Alerts
+* Incidents
+* Tickets
+* AI Agents
+* RAG Queries
+* Threat Intelligence
+* Risk Scores
+
+Provide endpoint examples.
+
+Explain:
+
+* Authentication
+* Authorization
+* Rate limiting
+
+---
+
+SECTION 11 — DEPLOYMENT ARCHITECTURE
+
+Design deployment for:
+
+Development:
+
+* Local deployment
+
+Production:
+
+* Docker
+* Kubernetes
+* Cloud deployment
+
+Recommend:
+
+* Azure
+* AWS
+* GCP
+
+Provide CI/CD architecture.
+
+Include:
+
+* GitHub Actions
+* Automated Testing
+* Security Scanning
+
+---
+
+SECTION 12 — HACKATHON ARCHITECTURE PRIORITIZATION
+
+Separate everything into:
+
+Tier 1:
+Must build for the hackathon
+
+Tier 2:
+Nice to have
+
+Tier 3:
+Future roadmap
+
+For every component provide:
+
+* Development effort
+* Demo value
+* Innovation score impact
+* Real-world applicability impact
+
+Goal:
+
+Design a visually impressive, enterprise-grade architecture that significantly increases SecureFlow AI's Technical Architecture score while remaining realistic for a student hackathon project.
