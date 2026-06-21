@@ -12,11 +12,27 @@ export default function GraphExplorer() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedNode, setSelectedNode] = useState<any>(null);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   
-  const fgRef = useRef<any>();
+  const fgRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setDimensions({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height,
+        });
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
   }, []);
 
   async function loadData() {
@@ -61,14 +77,11 @@ export default function GraphExplorer() {
   const handleNodeClick = useCallback((node: any) => {
     setSelectedNode(node);
     
-    // Aim at node from outside it
     if (fgRef.current) {
-      const distance = 40;
-      const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
       fgRef.current.centerAt(node.x, node.y, 1000);
-      fgRef.current.zoom(8, 2000);
+      fgRef.current.zoom(8, 1000);
     }
-  }, [fgRef]);
+  }, []);
 
   // Configure physics so nodes spread out safely
   useEffect(() => {
@@ -85,6 +98,48 @@ export default function GraphExplorer() {
     }, 500); // Wait for canvas to mount
     return () => clearTimeout(timer);
   }, [graphData]);
+
+  // Custom drawing for nodes to make them look premium
+  const drawNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    const label = node.label || node.id;
+    const fontSize = Math.max(12 / globalScale, 2);
+    const radius = 6;
+    const color = getNodeColor(node);
+
+    // Inner circle
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    // Outer glow ring
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, radius + 2, 0, 2 * Math.PI, false);
+    ctx.strokeStyle = `${color}40`; // 25% opacity
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Draw label when zoomed in or hovered/selected
+    const isSelected = selectedNode?.id === node.id;
+    if (globalScale > 1.5 || isSelected) {
+      ctx.font = `${isSelected ? 'bold ' : ''}${fontSize}px Sans-Serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = isSelected ? '#ffffff' : 'rgba(255,255,255,0.8)';
+      ctx.fillText(label, node.x, node.y + radius + fontSize + 2);
+      
+      // Draw selection ring
+      if (isSelected) {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, radius + 5, 0, 2 * Math.PI, false);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+  }, [selectedNode]);
 
   return (
     <div className="sf-animate-in" style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 40px)" }}>
@@ -103,7 +158,17 @@ export default function GraphExplorer() {
       <div style={{ display: "flex", flex: 1, gap: "24px", minHeight: 0 }}>
         
         {/* Main Canvas Area */}
-        <div className="sf-card" style={{ flex: 1, overflow: "hidden", position: "relative", padding: 0 }}>
+        <div 
+          ref={containerRef} 
+          className="sf-card" 
+          style={{ 
+            flex: 1, 
+            overflow: "hidden", 
+            position: "relative", 
+            padding: 0,
+            background: "radial-gradient(circle at center, #1e1b4b 0%, #0f1115 100%)" // Premium deep space background
+          }}
+        >
           {loading ? (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
               <div className="sf-loading-spinner" />
@@ -112,19 +177,28 @@ export default function GraphExplorer() {
             <ForceGraph2D
               ref={fgRef}
               graphData={graphData}
-              nodeLabel="label"
-              nodeColor={getNodeColor}
+              width={dimensions.width}
+              height={dimensions.height}
               nodeRelSize={6}
-              linkColor={() => "rgba(255,255,255,0.2)"}
+              linkColor={() => "rgba(255,255,255,0.15)"}
               linkWidth={1.5}
-              linkDirectionalArrowLength={3.5}
-              linkDirectionalArrowRelPos={1}
+              linkDirectionalParticles={2}
+              linkDirectionalParticleWidth={2}
+              linkDirectionalParticleSpeed={0.005}
+              linkDirectionalParticleColor={() => "rgba(255,255,255,0.8)"}
               onNodeClick={handleNodeClick}
-              backgroundColor="#0f1115"
-              width={800} // This will auto-resize via CSS generally, but requires fixed size component for exact fit. We'll rely on parent bounding in real world, but hardcoding for demo simplicity.
+              nodeCanvasObject={drawNode}
+              backgroundColor="transparent"
             />
           )}
           
+          {/* Overlay grid pattern to look like a tactical map */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none',
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+            backgroundSize: '40px 40px'
+          }} />
+
           <div style={{ position: "absolute", bottom: "16px", left: "16px", background: "rgba(0,0,0,0.6)", padding: "12px", borderRadius: "8px", backdropFilter: "blur(4px)" }}>
             <h4 style={{ fontSize: "12px", color: "var(--sf-text-muted)", marginBottom: "8px", textTransform: "uppercase" }}>Legend</h4>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", fontSize: "12px" }}>
@@ -168,8 +242,8 @@ export default function GraphExplorer() {
                   <div style={{ color: "var(--sf-text-secondary)", marginBottom: "4px" }}>Properties:</div>
                   {Object.entries(selectedNode.properties || {}).map(([k, v]) => (
                     <div key={k} style={{ background: "rgba(0,0,0,0.2)", padding: "8px", borderRadius: "4px" }}>
-                      <span style={{ color: "var(--sf-text-muted)", marginRight: "8px" }}>{k}:</span>
-                      <span style={{ color: "var(--sf-text-primary)", wordBreak: "break-all" }}>{String(v)}</span>
+                      <span style={{ color: "var(--sf-text-muted)", marginRight: "8px", textTransform: "capitalize" }}>{k}:</span>
+                      <span style={{ color: "var(--sf-text-primary)", wordBreak: "break-all", fontWeight: 500 }}>{String(v)}</span>
                     </div>
                   ))}
                   
@@ -179,8 +253,9 @@ export default function GraphExplorer() {
                 </div>
               </div>
             ) : (
-              <div style={{ color: "var(--sf-text-muted)", fontSize: "13px", textAlign: "center", padding: "20px 0" }}>
-                Click a node in the graph to inspect it.
+              <div style={{ color: "var(--sf-text-muted)", fontSize: "13px", textAlign: "center", padding: "30px 0" }}>
+                <div style={{ fontSize: "32px", opacity: 0.2, marginBottom: "12px" }}>🖱️</div>
+                Click any node in the graph to inspect its properties and relationships.
               </div>
             )}
           </div>
