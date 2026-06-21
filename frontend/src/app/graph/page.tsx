@@ -103,43 +103,66 @@ export default function GraphExplorer() {
   const drawNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const label = node.label || node.id;
     const fontSize = Math.max(12 / globalScale, 2);
-    const radius = 6;
+    const radius = 8; // Slightly larger for icons
     const color = getNodeColor(node);
 
+    // Glow effect
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 10;
+    
     // Inner circle
     ctx.beginPath();
     ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
     ctx.fillStyle = color;
     ctx.fill();
+    
+    // Reset shadow for performance
+    ctx.shadowBlur = 0;
 
-    // Outer glow ring
-    ctx.beginPath();
-    ctx.arc(node.x, node.y, radius + 2, 0, 2 * Math.PI, false);
-    ctx.strokeStyle = `${color}40`; // 25% opacity
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    // Draw an icon symbol based on type
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `${radius * 0.8}px Arial`;
+    
+    let icon = "•";
+    if (node.type === "alert") icon = "🚨";
+    else if (node.type === "ip") icon = "🌐";
+    else if (node.type === "user") icon = "👤";
+    else if (node.type === "device") icon = "💻";
+    else if (node.type === "mitre_technique") icon = "🎯";
+    else if (node.type === "incident") icon = "🔥";
+    
+    ctx.fillText(icon, node.x, node.y);
 
     // Draw label when zoomed in or hovered/selected
     const isSelected = selectedNode?.id === node.id;
-    if (globalScale > 1.5 || isSelected) {
+    if (globalScale > 1.2 || isSelected) {
       ctx.font = `${isSelected ? 'bold ' : ''}${fontSize}px Sans-Serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = isSelected ? '#ffffff' : 'rgba(255,255,255,0.8)';
-      ctx.fillText(label, node.x, node.y + radius + fontSize + 2);
+      ctx.fillStyle = isSelected ? '#ffffff' : 'rgba(255,255,255,0.7)';
+      ctx.fillText(label, node.x, node.y + radius + fontSize + 4);
       
       // Draw selection ring
       if (isSelected) {
         ctx.beginPath();
-        ctx.arc(node.x, node.y, radius + 5, 0, 2 * Math.PI, false);
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([2, 2]);
+        ctx.arc(node.x, node.y, radius + 6, 0, 2 * Math.PI, false);
+        ctx.strokeStyle = '#6366f1';
+        ctx.lineWidth = 2 / globalScale;
+        ctx.setLineDash([4, 4]);
         ctx.stroke();
         ctx.setLineDash([]);
       }
     }
   }, [selectedNode]);
+
+  // Crucial for hit detection when using nodeCanvasObject
+  const paintNodeHitArea = useCallback((node: any, color: string, ctx: CanvasRenderingContext2D) => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    // Use a larger hit radius to make clicking much easier
+    ctx.arc(node.x, node.y, 12, 0, 2 * Math.PI, false);
+    ctx.fill();
+  }, []);
 
   return (
     <div className="sf-animate-in" style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 40px)" }}>
@@ -174,7 +197,7 @@ export default function GraphExplorer() {
               <div className="sf-loading-spinner" />
             </div>
           ) : (
-            <ForceGraph2D
+              <ForceGraph2D
               ref={fgRef}
               graphData={graphData}
               width={dimensions.width}
@@ -188,6 +211,7 @@ export default function GraphExplorer() {
               linkDirectionalParticleColor={() => "rgba(255,255,255,0.8)"}
               onNodeClick={handleNodeClick}
               nodeCanvasObject={drawNode}
+              nodePointerAreaPaint={paintNodeHitArea}
               backgroundColor="transparent"
             />
           )}
