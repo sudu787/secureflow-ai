@@ -200,10 +200,10 @@ export default function DashboardPage() {
                       </td>
                       <td><span className={`sf-badge ${alert.severity}`}>{alert.severity}</span></td>
                       <td><span className={`sf-badge ${alert.priority?.toLowerCase()}`}>{alert.priority}</span></td>
-                      <td style={{ fontFamily: "monospace", fontSize: "12px", color: "var(--sf-accent-light)" }}>{alert.mitre_id || "â€”"}</td>
+                      <td style={{ fontFamily: "monospace", fontSize: "12px", color: "var(--sf-accent-light)" }}>{alert.mitre_id || "—"}</td>
                       <td><span className={`sf-badge ${alert.status}`}>{alert.status}</span></td>
                       <td style={{ fontSize: "12px", color: "var(--sf-text-muted)" }}>
-                        {alert.created_at ? new Date(alert.created_at).toLocaleTimeString() : "â€”"}
+                        {alert.created_at ? new Date(alert.created_at).toLocaleTimeString() : "—"}
                       </td>
                     </tr>
                   ))}
@@ -216,7 +216,7 @@ export default function DashboardPage() {
           <div className="sf-card">
             <div className="sf-card-header">
               <div>
-                <div className="sf-card-title">ðŸ¤– AI Agent Activity</div>
+                <div className="sf-card-title">🤖 AI Agent Activity</div>
                 <div className="sf-card-subtitle">Recent autonomous operations</div>
               </div>
             </div>
@@ -234,11 +234,11 @@ export default function DashboardPage() {
                     border: "1px solid var(--sf-border)",
                   }}>
                     <span style={{ fontSize: "16px" }}>
-                      {action.agent_name === "triage_agent" ? "ðŸŽ¯" :
-                       action.agent_name === "investigation_agent" ? "ðŸ”" :
-                       action.agent_name === "remediation_agent" ? "ðŸ”§" :
-                       action.agent_name === "it_support_agent" ? "ðŸ’»" :
-                       action.agent_name === "reporting_agent" ? "ðŸ“Š" : "ðŸ¤–"}
+                      {action.agent_name === "triage_agent" ? "🎯" :
+                       action.agent_name === "investigation_agent" ? "🔍" :
+                       action.agent_name === "remediation_agent" ? "🔧" :
+                       action.agent_name === "it_support_agent" ? "💻" :
+                       action.agent_name === "reporting_agent" ? "📊" : "🤖"}
                     </span>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: "13px", fontWeight: 500, color: "var(--sf-text-primary)" }}>
@@ -290,15 +290,15 @@ export default function DashboardPage() {
 
           {/* Security Components Health */}
           <div className="sf-card">
-            <div className="sf-card-title" style={{ marginBottom: "16px" }}>ðŸ”’ Security Architecture</div>
+            <div className="sf-card-title" style={{ marginBottom: "16px" }}>🔒 Security Architecture</div>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {[
-                { name: "Prompt Injection Defense", status: health?.components?.security?.prompt_injection, icon: "ðŸ›¡ï¸", detail: "11 attack categories" },
-                { name: "Output Validator", status: health?.components?.security?.output_validation, icon: "âœ…", detail: "PII, hallucination, canary" },
-                { name: "Canary Token System", status: health?.components?.security?.canary_tokens, icon: "ðŸ¤", detail: "Prompt leakage detection" },
-                { name: "Policy Engine", status: health?.components?.security?.policy_engine, icon: "ðŸ“‹", detail: "Action-level enforcement" },
-                { name: "Knowledge Base (RAG)", status: health?.components?.knowledge_base?.status, icon: "ðŸ§ ", detail: `${health?.components?.knowledge_base?.documents ?? 0} documents` },
-                { name: "Ingestion Pipeline", status: health?.components?.ingestion?.status, icon: "ðŸ“¡", detail: `${health?.components?.ingestion?.events_ingested ?? 0} events` },
+                { name: "Prompt Injection Defense", status: health?.components?.security?.prompt_injection, icon: "🛡️", detail: "11 attack categories" },
+                { name: "Output Validator", status: health?.components?.security?.output_validation, icon: "✅", detail: "PII, hallucination, canary" },
+                { name: "Canary Token System", status: health?.components?.security?.canary_tokens, icon: "🐤", detail: "Prompt leakage detection" },
+                { name: "Policy Engine", status: health?.components?.security?.policy_engine, icon: "📋", detail: "Action-level enforcement" },
+                { name: "Knowledge Base (RAG)", status: health?.components?.knowledge_base?.status, icon: "🧠", detail: `${health?.components?.knowledge_base?.documents ?? 0} documents` },
+                { name: "Ingestion Pipeline", status: health?.components?.ingestion?.status, icon: "📡", detail: `${health?.components?.ingestion?.events_ingested ?? 0} events` },
               ].map((comp, i) => (
                 <div key={i} style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
