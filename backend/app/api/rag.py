@@ -195,8 +195,7 @@ async def investigate_alert_with_rag(alert_id: int, use_agentic: bool = True):
 
         if not alert:
             raise HTTPException(status_code=404, detail="Alert not found")
-
-        query = f"{alert.title}. MITRE technique {alert.mitre_technique or ''}. {alert.description or ''}"
+        query = f"{alert.title}. MITRE technique {alert.mitre_id or ''}. {alert.description or ''}"
 
         if use_agentic:
             from app.knowledge.agentic_rag import get_agentic_router
