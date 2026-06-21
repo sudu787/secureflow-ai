@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { LayoutDashboard, BellRing, Target, Ticket, Brain, Network, MessageSquare, FileText, Bot, Gamepad2, Shield, ShieldCheck, Zap, TrendingUp } from "lucide-react";
+import { LayoutDashboard, BellRing, Target, Ticket, Brain, Network, MessageSquare, FileText, Bot, Gamepad2, Shield, ShieldCheck, Zap, TrendingUp, Swords, Globe, Crosshair } from "lucide-react";
 
 const navItems = [
   { section: "Operations" },
@@ -12,7 +12,10 @@ const navItems = [
   { href: "/incidents", label: "Incidents", Icon: Target },
   { href: "/tickets", label: "Tickets", Icon: Ticket },
   { section: "Intelligence" },
-  { href: "/knowledge", label: "Knowledge Base", Icon: Brain },
+  { href: "/knowledge", label: "RAG Explorer", Icon: Brain },
+  { href: "/mitre", label: "MITRE ATT&CK", Icon: Swords },
+  { href: "/threat-intel", label: "Threat Intel", Icon: Globe },
+  { href: "/investigate", label: "Investigation", Icon: Crosshair },
   { href: "/graph", label: "Graph Explorer", Icon: Network },
   { href: "/chat", label: "AI Assistant", Icon: MessageSquare },
   { href: "/logs", label: "Log Viewer", Icon: FileText },

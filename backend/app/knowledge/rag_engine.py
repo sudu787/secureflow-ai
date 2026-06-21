@@ -63,6 +63,10 @@ class AdvancedRAGEngine:
             "nist": "nist_knowledge.json",
             "cve": "cve_knowledge.json",
             "playbooks": "playbooks.json",
+            # New Part 4 knowledge sources
+            "cisa_kev": "cisa_kev.json",
+            "sans": "sans_knowledge.json",
+            "owasp_llm": "owasp_llm_api.json",
         }
 
         docs_to_add = []
@@ -82,14 +86,21 @@ class AdvancedRAGEngine:
                 for i, item in enumerate(items):
                     doc_id = f"{source}-{item.get('id', i)}"
                     
-                    # Create search text
+                    # Create search text — covers all document schemas
                     text_parts = [
-                        str(item.get("name", item.get("control", item.get("id", "")))),
-                        str(item.get("description", "")),
+                        str(item.get("name", item.get("control", item.get("title", item.get("id", ""))))),
+                        str(item.get("description", item.get("short_description", item.get("content", "")))),
                         str(item.get("detection", "")),
-                        str(item.get("remediation", item.get("implementation", "")))
+                        str(item.get("remediation", item.get("implementation", ""))),
+                        str(item.get("tactic", item.get("domain", item.get("category", "")))),
+                        str(item.get("cve_id", "")),
+                        str(item.get("known_ransomware_campaign", item.get("ransomware_campaign", ""))),
+                        # Arrays → join
+                        " ".join(item.get("mitigations", [])) if isinstance(item.get("mitigations"), list) else str(item.get("mitigations", "")),
+                        " ".join(item.get("examples", [])) if isinstance(item.get("examples"), list) else "",
+                        " ".join(item.get("key_recommendations", [])) if isinstance(item.get("key_recommendations"), list) else "",
                     ]
-                    search_text = " ".join([p for p in text_parts if p]).lower()
+                    search_text = " ".join([p for p in text_parts if p and p != "None"]).lower()
                     
                     # Metadata for filtering
                     meta = {

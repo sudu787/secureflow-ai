@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getRagStats, searchRag } from "@/lib/api";
+import { Brain, Zap, Search } from "lucide-react";
 
 interface KnowledgeResult {
   id: string;
@@ -10,193 +11,180 @@ interface KnowledgeResult {
   data: any;
 }
 
+const SOURCE_COLORS: Record<string, string> = {
+  mitre: "#dc2626", cve: "#f97316", nist: "#6366f1",
+  cis: "#3b82f6", playbooks: "#10b981", owasp: "#f59e0b",
+  cisa_kev: "#ef4444", sans: "#22c55e", owasp_llm: "#06b6d4",
+};
+
 export default function KnowledgeExplorer() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<KnowledgeResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [sourceFilter, setSourceFilter] = useState("");
+  const [agenticMode, setAgenticMode] = useState(true);
+  const [agenticMeta, setAgenticMeta] = useState<any>(null);
 
-  useEffect(() => {
-    loadStats();
-  }, []);
+  useEffect(() => { loadStats(); }, []);
 
   async function loadStats() {
-    try {
-      const data = await getRagStats();
-      setStats(data);
-    } catch (e) {
-      console.error("Failed to load RAG stats", e);
-    }
+    try { setStats(await getRagStats()); } catch {}
   }
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (!query.trim()) return;
-
     setIsSearching(true);
+    setAgenticMeta(null);
     try {
-      const data = await searchRag(query, sourceFilter);
-      setResults(data.results || []);
+      if (agenticMode) {
+        const res = await fetch("http://localhost:8000/api/rag/agentic/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, top_k: 10, include_context: false }),
+        });
+        const data = await res.json();
+        setResults(data.results || []);
+        setAgenticMeta({ domain: data.domain, agent: data.agent, confidence: data.confidence, priority_sources: data.priority_sources, sub_queries: data.sub_queries });
+      } else {
+        const data = await searchRag(query, sourceFilter);
+        setResults(data.results || []);
+      }
     } catch (e: any) {
-      alert("Search failed: " + e.message);
+      console.error(e);
     } finally {
       setIsSearching(false);
     }
   }
 
-  const getSourceColor = (source: string) => {
-    switch(source) {
-      case 'mitre': return 'var(--sf-danger)';
-      case 'cve': return 'var(--sf-warning)';
-      case 'nist':
-      case 'cis': return 'var(--sf-primary)';
-      case 'playbooks': return 'var(--sf-success)';
-      default: return 'var(--sf-text-secondary)';
-    }
-  };
-
   return (
     <div className="sf-animate-in">
       <div className="sf-page-header">
         <div>
-          <h1 className="sf-page-title">🧠 Advanced RAG Explorer</h1>
-          <p className="sf-page-subtitle">Search the cybersecurity knowledge base using Semantic + BM25 Hybrid Retrieval</p>
+          <h1 className="sf-page-title">Advanced RAG Explorer</h1>
+          <p className="sf-page-subtitle">Hybrid Semantic + BM25 + Agentic retrieval across 9 security knowledge sources</p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ fontSize: "12px", color: "var(--sf-text-muted)" }}>Agentic Mode</span>
+          <button onClick={() => setAgenticMode(!agenticMode)} style={{
+            width: "44px", height: "24px", borderRadius: "12px", border: "none",
+            background: agenticMode ? "#6366f1" : "rgba(255,255,255,0.1)", cursor: "pointer", position: "relative", transition: "background 0.2s",
+          }}>
+            <span style={{ position: "absolute", top: "3px", left: agenticMode ? "22px" : "3px", width: "18px", height: "18px", borderRadius: "50%", background: "white", transition: "left 0.2s" }} />
+          </button>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px" }}>
-        {/* Main Search Area */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: "24px" }}>
         <div>
-          <form onSubmit={handleSearch} className="sf-card" style={{ padding: "24px", marginBottom: "24px" }}>
-            <div style={{ display: "flex", gap: "12px", marginBottom: "16px" }}>
-              <input
-                type="text"
-                className="sf-input"
-                style={{ flex: 1 }}
-                placeholder="Search for threats, vulnerabilities, compliance controls..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-              <select 
-                className="sf-input"
-                value={sourceFilter}
-                onChange={(e) => setSourceFilter(e.target.value)}
-              >
-                <option value="">All Sources</option>
-                <option value="mitre">MITRE ATT&CK</option>
-                <option value="cve">CVE Database</option>
-                <option value="nist">NIST CSF</option>
-                <option value="cis">CIS Controls</option>
-                <option value="playbooks">IR Playbooks</option>
-              </select>
+          <form onSubmit={handleSearch} className="sf-card" style={{ padding: "20px", marginBottom: "16px" }}>
+            <div style={{ display: "flex", gap: "12px", marginBottom: "12px" }}>
+              <input type="text" className="sf-input" style={{ flex: 1 }}
+                placeholder="e.g. CVE-2021-44228, brute force detection, NIST incident response..."
+                value={query} onChange={(e) => setQuery(e.target.value)} />
+              {!agenticMode && (
+                <select className="sf-input" style={{ width: "160px" }} value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}>
+                  <option value="">All Sources</option>
+                  <option value="mitre">MITRE ATT&CK</option>
+                  <option value="cve">CVE Database</option>
+                  <option value="cisa_kev">CISA KEV</option>
+                  <option value="nist">NIST CSF</option>
+                  <option value="cis">CIS Controls</option>
+                  <option value="owasp">OWASP Top 10</option>
+                  <option value="owasp_llm">OWASP LLM</option>
+                  <option value="sans">SANS</option>
+                  <option value="playbooks">IR Playbooks</option>
+                </select>
+              )}
               <button type="submit" className="sf-btn sf-btn-primary" disabled={isSearching}>
-                {isSearching ? "Searching..." : "🔍 Search"}
+                <Search size={14} /> {isSearching ? "Searching..." : agenticMode ? "Agentic Search" : "Search"}
               </button>
+            </div>
+            <div style={{ fontSize: "11px", color: "var(--sf-text-muted)" }}>
+              {agenticMode ? "🤖 Agentic mode: AI routes to the best knowledge agent automatically" : "🔍 Standard hybrid search (Semantic + BM25 + RRF)"}
             </div>
           </form>
 
-          {/* Results Area */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {agenticMeta && (
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "16px", padding: "12px 16px", borderRadius: "8px", background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
+              <div style={{ fontSize: "12px", display: "flex", gap: "6px", alignItems: "center" }}>
+                <Zap size={13} color="#6366f1" />
+                <span style={{ color: "var(--sf-text-muted)" }}>Agent:</span>
+                <span style={{ color: "#a5b4fc", fontWeight: 600 }}>{agenticMeta.agent?.replace(/_/g, " ")}</span>
+              </div>
+              <div style={{ fontSize: "12px", color: "var(--sf-text-muted)" }}>Domain: <span style={{ color: "#a5b4fc", fontWeight: 600 }}>{agenticMeta.domain}</span></div>
+              <div style={{ fontSize: "12px", color: "var(--sf-text-muted)" }}>Confidence: <span style={{ color: "#10b981", fontWeight: 600 }}>{(agenticMeta.confidence * 100).toFixed(0)}%</span></div>
+              <div style={{ fontSize: "12px", color: "var(--sf-text-muted)" }}>Sources: <span style={{ color: "#a5b4fc" }}>{agenticMeta.priority_sources?.join(", ")}</span></div>
+            </div>
+          )}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
             {results.map((result, i) => (
-              <div key={i} className="sf-card" style={{ padding: "20px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
-                  <div>
-                    <span 
-                      style={{ 
-                        fontSize: "12px", fontWeight: 700, 
-                        color: getSourceColor(result.source), 
-                        textTransform: "uppercase",
-                        marginRight: "8px"
-                      }}
-                    >
+              <div key={i} className="sf-card" style={{ padding: "18px", borderLeft: `4px solid ${SOURCE_COLORS[result.source] || "#6b7280"}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+                  <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 700, color: SOURCE_COLORS[result.source] || "#6b7280", textTransform: "uppercase", background: `${SOURCE_COLORS[result.source] || "#6b7280"}15`, padding: "2px 8px", borderRadius: "4px" }}>
                       {result.source}
                     </span>
-                    <span style={{ color: "var(--sf-text-muted)", fontSize: "13px" }}>ID: {result.id}</span>
+                    <span style={{ color: "var(--sf-text-muted)", fontSize: "11px", fontFamily: "monospace" }}>{result.id}</span>
                   </div>
-                  <div style={{ fontSize: "12px", background: "var(--sf-bg-elevated)", padding: "4px 8px", borderRadius: "4px" }}>
+                  <div style={{ fontSize: "11px", background: "var(--sf-bg-elevated)", padding: "3px 8px", borderRadius: "4px" }}>
                     Score: {result.score.toFixed(3)}
                   </div>
                 </div>
-
-                <h3 style={{ fontSize: "16px", fontWeight: 600, color: "var(--sf-text-primary)", marginBottom: "8px" }}>
-                  {result.data.name || result.data.control || result.data.id || "Untitled Document"}
+                <h3 style={{ fontSize: "15px", fontWeight: 600, marginBottom: "8px" }}>
+                  {result.data?.name || result.data?.title || result.data?.control || result.data?.id || "Document"}
                 </h3>
-                
-                <p style={{ fontSize: "14px", color: "var(--sf-text-secondary)", lineHeight: 1.6, marginBottom: "12px" }}>
-                  {result.data.description}
+                <p style={{ fontSize: "13px", color: "var(--sf-text-secondary)", lineHeight: 1.6, marginBottom: "10px" }}>
+                  {(result.data?.description || result.data?.short_description || result.data?.content || "").substring(0, 250)}
                 </p>
-
-                {/* Specific fields based on source */}
-                <div style={{ fontSize: "13px", display: "grid", gap: "8px", background: "rgba(0,0,0,0.1)", padding: "12px", borderRadius: "8px" }}>
-                  {result.data.cvss && (
-                    <div><strong style={{color:"var(--sf-text-primary)"}}>CVSS:</strong> <span style={{color:"var(--sf-danger)"}}>{result.data.cvss}</span></div>
-                  )}
-                  {result.data.tactic && (
-                    <div><strong style={{color:"var(--sf-text-primary)"}}>Tactic:</strong> {result.data.tactic}</div>
-                  )}
-                  {result.data.remediation && (
-                    <div><strong style={{color:"var(--sf-text-primary)"}}>Remediation:</strong> {result.data.remediation}</div>
-                  )}
-                  {result.data.implementation && (
-                    <div><strong style={{color:"var(--sf-text-primary)"}}>Implementation:</strong> {result.data.implementation}</div>
-                  )}
-                  {result.data.detection && (
-                    <div><strong style={{color:"var(--sf-text-primary)"}}>Detection:</strong> {result.data.detection}</div>
-                  )}
+                <div style={{ display: "grid", gap: "6px", background: "rgba(0,0,0,0.1)", padding: "10px", borderRadius: "6px", fontSize: "12px" }}>
+                  {result.data?.cvss && <div><strong style={{ color: "var(--sf-text-primary)" }}>CVSS:</strong> <span style={{ color: "#dc2626", fontWeight: 700 }}>{result.data.cvss}</span></div>}
+                  {result.data?.tactic && <div><strong style={{ color: "var(--sf-text-primary)" }}>Tactic:</strong> {result.data.tactic}</div>}
+                  {result.data?.due_date && <div><strong style={{ color: "#dc2626" }}>CISA Deadline:</strong> <span style={{ color: "#dc2626" }}>{result.data.due_date}</span></div>}
+                  {result.data?.remediation && <div><strong style={{ color: "var(--sf-text-primary)" }}>Remediation:</strong> {String(result.data.remediation).substring(0, 150)}</div>}
+                  {result.data?.detection && <div><strong style={{ color: "var(--sf-text-primary)" }}>Detection:</strong> {String(result.data.detection).substring(0, 150)}</div>}
                 </div>
               </div>
             ))}
-
             {results.length === 0 && !isSearching && query && (
-              <div style={{ textAlign: "center", padding: "40px", color: "var(--sf-text-muted)" }}>
-                No results found for "{query}". Try different keywords.
-              </div>
+              <div style={{ textAlign: "center", padding: "40px", color: "var(--sf-text-muted)" }}>No results for "{query}".</div>
             )}
           </div>
         </div>
 
-        {/* Sidebar / Engine Stats */}
-        <div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           <div className="sf-card" style={{ padding: "20px" }}>
-            <h3 style={{ fontSize: "14px", fontWeight: 600, color: "var(--sf-text-primary)", marginBottom: "16px" }}>
-              RAG Engine Status
-            </h3>
-            
+            <h3 style={{ fontSize: "13px", fontWeight: 600, marginBottom: "16px" }}>RAG Engine</h3>
             {stats ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px", fontSize: "13px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ color: "var(--sf-text-muted)" }}>Status</span>
-                  <span style={{ color: stats.loaded ? "var(--sf-success)" : "var(--sf-danger)", fontWeight: 600 }}>
-                    {stats.loaded ? "🟢 Online" : "🔴 Offline"}
-                  </span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ color: "var(--sf-text-muted)" }}>Documents Indexed</span>
-                  <span style={{ color: "var(--sf-text-primary)" }}>{stats.total_documents}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ color: "var(--sf-text-muted)" }}>Embedding Model</span>
-                  <span style={{ color: "var(--sf-text-primary)" }}>{stats.embedding_model}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ color: "var(--sf-text-muted)" }}>Vector Store</span>
-                  <span style={{ color: "var(--sf-text-primary)" }}>{stats.vector_store}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ color: "var(--sf-text-muted)" }}>Hybrid Search</span>
-                  <span style={{ color: "var(--sf-text-primary)" }}>{stats.hybrid_search ? "Enabled" : "Disabled"}</span>
-                </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "12px" }}>
+                {[
+                  { label: "Status", value: stats.loaded ? "Online" : "Offline", color: stats.loaded ? "#10b981" : "#dc2626" },
+                  { label: "Documents", value: stats.total_documents },
+                  { label: "Embedding", value: "MiniLM-L6-v2" },
+                  { label: "Vector Store", value: "ChromaDB" },
+                  { label: "Hybrid Search", value: "RRF Enabled" },
+                  { label: "Agentic Router", value: "Active" },
+                ].map((row) => (
+                  <div key={row.label} style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ color: "var(--sf-text-muted)" }}>{row.label}</span>
+                    <span style={{ color: (row as any).color || "var(--sf-text-primary)", fontWeight: 600 }}>{row.value}</span>
+                  </div>
+                ))}
               </div>
-            ) : (
-              <div style={{ fontSize: "13px", color: "var(--sf-text-muted)" }}>Loading stats...</div>
-            )}
+            ) : <div style={{ fontSize: "12px", color: "var(--sf-text-muted)" }}>Loading...</div>}
+          </div>
 
-            <div style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px solid var(--sf-border)" }}>
-              <div style={{ fontSize: "12px", color: "var(--sf-text-secondary)", lineHeight: 1.5 }}>
-                <strong style={{ color: "var(--sf-text-primary)", display: "block", marginBottom: "8px" }}>How it works:</strong>
-                Queries are encoded using <em>SentenceTransformers</em> and matched against ChromaDB vectors. Simultaneously, a BM25 algorithm performs keyword matching. Results are combined using Reciprocal Rank Fusion.
-              </div>
+          <div className="sf-card" style={{ padding: "20px" }}>
+            <h3 style={{ fontSize: "13px", fontWeight: 600, marginBottom: "12px" }}>Knowledge Sources (9)</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {Object.entries(SOURCE_COLORS).map(([src, color]) => (
+                <div key={src} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px" }}>
+                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: color, flexShrink: 0 }} />
+                  <span style={{ color: "var(--sf-text-secondary)", textTransform: "uppercase", fontWeight: 600 }}>{src.replace(/_/g, " ")}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
