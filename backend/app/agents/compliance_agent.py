@@ -143,12 +143,54 @@ Always cite specific control IDs and subcategories.
 Output format: JSON only."""
 
     def analyze_alert_compliance(self, alert: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze a single alert for compliance violations."""
+        """Analyze a single alert for compliance violations (graph-enriched)."""
         start_time = time.time()
 
         alert_type = self._classify_alert_type(alert)
         nist_mapping = NIST_CSF_MAPPINGS.get(alert_type, {})
         cis_mapping = CIS_CONTROLS_MAPPINGS.get(alert_type, {})
+
+        # ── Graph enrichment: pull compliance controls from KG ───────────
+        graph_controls = {}
+        mitre_gaps = []
+        try:
+            from app.knowledge.knowledge_graph import get_knowledge_graph
+            kg = get_knowledge_graph()
+            if kg.available:
+                # Get MITRE coverage gaps
+                cov = kg.get_mitre_coverage()
+                mitre_gaps = cov.get("uncovered_techniques", [])
+                coverage_pct = cov.get("coverage_pct", 100)
+                # Get compliance control context for this alert's MITRE technique
+                mitre_id = alert.get("mitre_id") or alert.get("mitre_technique")
+                if mitre_id:
+                    ctx = kg.get_entity_context(mitre_id, "mitre_technique", max_depth=2)
+                    # Find compliance controls that map to this technique
+                    related_controls = [
+                        r for r in ctx.get("related", [])
+                        if r["type"] in ("security_control", "compliance_control")
+                    ]
+                    graph_controls = {
+                        "mitre_technique": mitre_id,
+                        "related_controls": [c["entity"] for c in related_controls],
+                        "coverage_pct": coverage_pct,
+                        "uncovered": mitre_id.split(":")[-1] in mitre_gaps,
+                    }
+                # Ingest alert into graph
+                kg.ingest_alert(alert)
+        except Exception as e:
+            logger.debug(f"ComplianceAgent graph enrichment failed: {e}")
+
+        graph_section = ""
+        if graph_controls:
+            graph_section = (
+                f"\nKNOWLEDGE GRAPH COMPLIANCE CONTEXT:\n"
+                f"  MITRE Technique: {graph_controls.get('mitre_technique')}\n"
+                f"  Security controls mapped: {graph_controls.get('related_controls')}\n"
+                f"  MITRE coverage: {graph_controls.get('coverage_pct')}%\n"
+                f"  Technique uncovered by controls: {graph_controls.get('uncovered')}\n"
+                f"  Uncovered techniques (global): {mitre_gaps[:5]}\n"
+            )
 
         # Build LLM prompt for deep compliance analysis
         prompt = f"""Compliance analysis for security alert:
@@ -163,7 +205,7 @@ ALERT DETAILS:
 PRE-MAPPED CONTROLS:
 - NIST CSF: {json.dumps(nist_mapping)}
 - CIS Controls: {json.dumps(cis_mapping)}
-
+{graph_section}
 TASK: Provide detailed compliance analysis.
 
 Return JSON:
@@ -179,29 +221,25 @@ Return JSON:
     "Step 2: Configure MFA for all privileged accounts"
   ],
   "evidence_items": [
-    "Alert log #{alert_id}",
+    "Alert log",
     "Authentication logs from source IP"
   ],
   "regulatory_risk": "audit_finding|reportable_incident|material_breach",
   "compliance_notes": "<audit-ready notes>"
 }}"""
 
-        llm_result = {}
-        try:
-            raw = self._call_llm(prompt, self._system_prompt())
-            llm_result = self._parse_json(raw) or {}
-        except Exception as e:
-            logger.debug(f"ComplianceAgent LLM call failed: {e}")
+        llm_result = self.call_llm_json(prompt, self._system_prompt()) or {}
 
         violation = {
-            "alert_id": alert.get("id"),
-            "alert_title": alert.get("title"),
-            "alert_type": alert_type,
-            "nist_mapping": nist_mapping,
-            "cis_mapping": cis_mapping,
-            "llm_analysis": llm_result,
-            "detected_at": datetime.utcnow().isoformat(),
-            "severity": alert.get("severity", "medium"),
+            "alert_id":        alert.get("id"),
+            "alert_title":     alert.get("title"),
+            "alert_type":      alert_type,
+            "nist_mapping":    nist_mapping,
+            "cis_mapping":     cis_mapping,
+            "graph_controls":  graph_controls,
+            "llm_analysis":    llm_result,
+            "detected_at":     datetime.utcnow().isoformat(),
+            "severity":        alert.get("severity", "medium"),
             "processing_time_ms": int((time.time() - start_time) * 1000),
         }
 
@@ -211,7 +249,17 @@ Return JSON:
         return violation
 
     def get_compliance_score(self, recent_alerts: List[Dict], total_controls: int = 153) -> Dict[str, Any]:
-        """Calculate overall compliance posture score."""
+        """Calculate overall compliance posture score with graph-enriched MITRE coverage."""
+        # Pull MITRE coverage from graph
+        graph_coverage = {}
+        try:
+            from app.knowledge.knowledge_graph import get_knowledge_graph
+            kg = get_knowledge_graph()
+            if kg.available:
+                graph_coverage = kg.get_mitre_coverage()
+        except Exception:
+            pass
+
         if not recent_alerts:
             return {
                 "overall_score": 95,
@@ -223,6 +271,7 @@ Return JSON:
                     "cis_controls": {"score": 96, "status": "compliant"},
                 },
                 "violations": [],
+                "graph_mitre_coverage": graph_coverage,
                 "timestamp": datetime.utcnow().isoformat(),
             }
 
@@ -248,35 +297,40 @@ Return JSON:
 
         # Score: start at 100, deduct per violation and severity
         nist_score = max(100 - (violation_count * 5) - (critical_alerts * 3), 0)
-        cis_score = max(100 - (violation_count * 4) - (critical_alerts * 2), 0)
-        overall = round((nist_score * 0.5 + cis_score * 0.5), 1)
+        cis_score  = max(100 - (violation_count * 4) - (critical_alerts * 2), 0)
+        overall    = round((nist_score * 0.5 + cis_score * 0.5), 1)
+
+        # Apply graph MITRE coverage penalty
+        if graph_coverage.get("coverage_pct", 100) < 70:
+            overall = max(overall - 5, 0)
 
         score_record = {
             "overall_score": overall,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp":     datetime.utcnow().isoformat(),
         }
         _compliance_score_history.append(score_record)
 
         return {
-            "overall_score": overall,
-            "risk_level": self._score_to_risk(overall),
+            "overall_score":     overall,
+            "risk_level":        self._score_to_risk(overall),
             "controls_violated": violation_count,
-            "total_controls": total_controls,
+            "total_controls":    total_controls,
             "frameworks": {
                 "nist_csf": {
-                    "score": round(nist_score, 1),
-                    "status": "compliant" if nist_score >= 80 else "non_compliant",
+                    "score":               round(nist_score, 1),
+                    "status":              "compliant" if nist_score >= 80 else "non_compliant",
                     "violated_categories": list(set(violations_by_framework["nist"])),
                 },
                 "cis_controls": {
-                    "score": round(cis_score, 1),
-                    "status": "compliant" if cis_score >= 80 else "non_compliant",
+                    "score":            round(cis_score, 1),
+                    "status":           "compliant" if cis_score >= 80 else "non_compliant",
                     "violated_controls": list(set(violations_by_framework["cis"])),
                 },
             },
-            "recent_violations": _compliance_violations[-10:],
-            "score_trend": _compliance_score_history[-30:],
-            "timestamp": datetime.utcnow().isoformat(),
+            "recent_violations":    _compliance_violations[-10:],
+            "score_trend":          _compliance_score_history[-30:],
+            "graph_mitre_coverage": graph_coverage,
+            "timestamp":            datetime.utcnow().isoformat(),
         }
 
     def process(self, input_data: Dict[str, Any], db=None) -> Dict[str, Any]:

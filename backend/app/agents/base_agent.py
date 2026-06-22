@@ -432,13 +432,26 @@ class BaseAgent(ABC):
                 logger.warning(f"[{self.name}] Groq API error: {e}")
             return None
 
-    # ─── RAG Knowledge Retrieval ───────────────────────────────────────
+    # ─── GraphRAG Knowledge Retrieval (Graph + RAG fused) ─────────────
 
     def get_knowledge_context(self, query: str) -> str:
         """
-        Retrieve relevant knowledge from the RAG knowledge base.
-        Returns formatted context string to prepend to LLM prompt.
+        Retrieve enriched context via GraphRAG Fusion:
+          1. Knowledge Graph entity traversal (relationships, attack paths, risk)
+          2. RAG vector search (threat intel, playbooks, compliance docs)
+          3. Merged & ranked context injected into LLM prompt.
+        Falls back to RAG-only if graph is unavailable.
         """
+        try:
+            from app.knowledge.graph_rag_fusion import get_graph_rag_fusion
+            fusion = get_graph_rag_fusion()
+            ctx = fusion.get_fused_context(query, agent_name=self.name)
+            if ctx:
+                return ctx
+        except Exception as e:
+            logger.debug(f"[{self.name}] GraphRAG fusion skipped: {e}")
+
+        # Fallback: plain RAG
         try:
             from app.knowledge.rag_engine import get_rag_engine
             from app.config import settings
@@ -447,6 +460,32 @@ class BaseAgent(ABC):
         except Exception as e:
             logger.debug(f"[{self.name}] Knowledge retrieval skipped: {e}")
             return ""
+
+    def get_graph_context(self, entity_id: str, entity_type: str, depth: int = 2) -> Dict:
+        """
+        Get knowledge graph context for a specific entity.
+        Used by investigation, triage, and prediction agents.
+        """
+        try:
+            from app.knowledge.knowledge_graph import get_knowledge_graph
+            kg = get_knowledge_graph()
+            return kg.get_entity_context(entity_id, entity_type, max_depth=depth)
+        except Exception as e:
+            logger.debug(f"[{self.name}] Graph context skipped: {e}")
+            return {}
+
+    def get_blast_radius(self, entity_id: str, entity_type: str) -> Dict:
+        """
+        Compute risk propagation blast radius from a compromised entity.
+        Used by triage and autonomous response agents.
+        """
+        try:
+            from app.knowledge.graph_rag_fusion import get_graph_rag_fusion
+            fusion = get_graph_rag_fusion()
+            return fusion.get_blast_radius(entity_id, entity_type)
+        except Exception as e:
+            logger.debug(f"[{self.name}] Blast radius skipped: {e}")
+            return {}
 
     # ─── JSON Helper ───────────────────────────────────────────────────────
 

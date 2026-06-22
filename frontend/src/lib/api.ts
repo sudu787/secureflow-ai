@@ -222,7 +222,35 @@ export const searchRag = (query: string, sourceFilter?: string) => {
 // ─── Knowledge Graph ────────────────────────────────────────────────────────────
 export const getGraphStats = () => fetchAPI<any>('/api/knowledge-graph/stats');
 export const getGraphVisualization = () => fetchAPI<any>('/api/knowledge-graph/visualization');
-export const getEntityContext = (type: string, id: string) => fetchAPI<any>(`/api/knowledge-graph/entity/${type}/${id}`);
+export const getEntityContext = (type: string, id: string) => fetchAPI<any>(`/api/knowledge-graph/entity/${type}/${encodeURIComponent(id)}`);
+export const getAttackPath = (srcId: string, srcType: string, tgtId: string, tgtType: string) =>
+  fetchAPI<any>(`/api/knowledge-graph/attack-path?source_id=${encodeURIComponent(srcId)}&source_type=${srcType}&target_id=${encodeURIComponent(tgtId)}&target_type=${tgtType}`);
+
+// ─── Risk Propagation ────────────────────────────────────────────────────────
+export const propagateRisk = (entityId: string, entityType: string, initialScore = 0.9) =>
+  fetchAPI<any>(`/api/knowledge-graph/risk/propagate/${entityType}/${encodeURIComponent(entityId)}?initial_score=${initialScore}`);
+
+// ─── Threat Hunting ────────────────────────────────────────────────────────────
+export const runAllHunts = () => fetchAPI<any>('/api/knowledge-graph/hunt/all');
+export const huntLateralMovement = () => fetchAPI<any>('/api/knowledge-graph/hunt/lateral-movement');
+export const huntMaliciousComms = () => fetchAPI<any>('/api/knowledge-graph/hunt/malicious-comms');
+export const huntHighRiskUsers = () => fetchAPI<any>('/api/knowledge-graph/hunt/high-risk-users');
+export const huntVulnerableAssets = () => fetchAPI<any>('/api/knowledge-graph/hunt/vulnerable-assets');
+
+// ─── MITRE Coverage ─────────────────────────────────────────────────────────
+export const getMitreCoverage = () => fetchAPI<any>('/api/knowledge-graph/mitre/coverage');
+
+// ─── GraphRAG Fusion ────────────────────────────────────────────────────────
+export const getGraphRagContext = (query: string, agentName = 'api') =>
+  fetchAPI<any>('/api/knowledge-graph/graphrag/context', {
+    method: 'POST',
+    body: JSON.stringify({ query, agent_name: agentName }),
+  });
+export const getGraphRagStats = () => fetchAPI<any>('/api/knowledge-graph/graphrag/stats');
+
+// ─── Seed Graph ─────────────────────────────────────────────────────────────
+export const seedKnowledgeGraph = () =>
+  fetchAPI<any>('/api/knowledge-graph/seed', { method: 'POST' });
 
 // ─── Risk Scoring ────────────────────────────────────────────────────────────
 export const getOrgRiskScore = () => fetchAPI<any>('/api/risk/org');

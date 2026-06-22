@@ -152,7 +152,8 @@ Safety constraints (NEVER violate):
 
 Output format: JSON only. No prose explanations outside JSON structure."""
 
-    def _build_prompt(self, incident: Dict[str, Any]) -> str:
+    def _build_prompt(self, incident: Dict[str, Any], graph_context: Dict = None) -> str:
+        graph_context = graph_context or {}
         severity = incident.get("severity", "medium")
         alert_title = incident.get("title", "Unknown Alert")
         source_ip = incident.get("source_ip", "unknown")
@@ -165,6 +166,19 @@ Output format: JSON only. No prose explanations outside JSON structure."""
             for name, info in RESPONSE_ACTIONS.items()
         ])
 
+        graph_section = ""
+        if graph_context:
+            br = graph_context.get("blast_radius", {})
+            lateral = graph_context.get("lateral_chains", [])
+            graph_section = (
+                f"\nKNOWLEDGE GRAPH CONTEXT:\n"
+                f"  Blast Radius: {graph_context.get('total_affected', 0)} entities at risk "
+                f"(critical={br.get('critical',0)}, high={br.get('high',0)})\n"
+                f"  Affected entities: {[e.get('entity','') for e in graph_context.get('affected_entities', [])[:4]]}\n"
+                f"  Active lateral movement chains: {len(lateral)}\n"
+                f"  Malicious comms detected: {graph_context.get('malicious_comms', 0)}\n"
+            )
+
         return f"""Incident requiring autonomous response:
 
 INCIDENT DETAILS:
@@ -174,7 +188,7 @@ INCIDENT DETAILS:
 - Affected Asset: {affected_asset}
 - MITRE Technique: {mitre_technique}
 - Autonomy Mode: {mode.upper()}
-
+{graph_section}
 AVAILABLE RESPONSE ACTIONS:
 {available_actions}
 
@@ -209,14 +223,35 @@ Return JSON with this exact structure:
 }}"""
 
     def process(self, incident: Dict[str, Any], db=None) -> Dict[str, Any]:
-        """Process an incident and generate/execute response actions."""
+        """Process an incident and generate/execute response actions (graph-enriched)."""
         start_time = time.time()
+
+        # ── Graph enrichment: blast radius + lateral movement chains ─────
+        graph_ctx = {}
+        try:
+            from app.knowledge.knowledge_graph import get_knowledge_graph
+            kg = get_knowledge_graph()
+            if kg.available:
+                source_ip = incident.get("source_ip")
+                if source_ip:
+                    br_data = kg.propagate_risk(source_ip, "ip")
+                    graph_ctx = {
+                        "total_affected":  br_data.get("total_affected", 0),
+                        "blast_radius":    br_data.get("blast_radius", {}),
+                        "affected_entities": br_data.get("affected_entities", [])[:8],
+                    }
+                lateral_chains = kg.hunt_lateral_movement()
+                graph_ctx["lateral_chains"] = lateral_chains
+                malicious_comms = kg.hunt_devices_with_malicious_ips()
+                graph_ctx["malicious_comms"] = len(malicious_comms)
+        except Exception as e:
+            logger.debug(f"AutonomousResponseAgent graph enrichment failed: {e}")
 
         try:
             system_prompt = self._system_prompt()
-            user_prompt = self._build_prompt(incident)
+            user_prompt = self._build_prompt(incident, graph_ctx)
 
-            raw_response = self._call_llm(user_prompt, system_prompt)
+            raw_response = self.call_llm(user_prompt, system_prompt)
             parsed = self._parse_json_response(raw_response)
 
             if not parsed:
@@ -259,20 +294,22 @@ Return JSON with this exact structure:
                     })
 
             result = {
-                "agent": self.name,
-                "mode": self.mode,
-                "incident_id": incident.get("id"),
-                "threat_assessment": parsed.get("threat_assessment", {}),
-                "containment_strategy": parsed.get("containment_strategy", ""),
-                "auto_executed_actions": approved,
-                "pending_approval_actions": queued_for_approval,
-                "requires_human_approval": len(queued_for_approval) > 0,
+                "agent":                      self.name,
+                "mode":                       self.mode,
+                "incident_id":                incident.get("id"),
+                "threat_assessment":          parsed.get("threat_assessment", {}),
+                "containment_strategy":       parsed.get("containment_strategy", ""),
+                "auto_executed_actions":      approved,
+                "pending_approval_actions":   queued_for_approval,
+                "requires_human_approval":    len(queued_for_approval) > 0,
                 "estimated_containment_minutes": parsed.get("estimated_containment_time_minutes", 15),
-                "total_actions": len(actions),
-                "auto_executed_count": len(approved),
-                "pending_count": len(queued_for_approval),
-                "processing_time_ms": int((time.time() - start_time) * 1000),
-                "timestamp": datetime.utcnow().isoformat(),
+                "total_actions":              len(actions),
+                "auto_executed_count":        len(approved),
+                "pending_count":              len(queued_for_approval),
+                "graph_blast_radius":         graph_ctx.get("blast_radius", {}),
+                "graph_affected_count":       graph_ctx.get("total_affected", 0),
+                "processing_time_ms":         int((time.time() - start_time) * 1000),
+                "timestamp":                  datetime.utcnow().isoformat(),
             }
 
             logger.info(

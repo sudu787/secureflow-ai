@@ -114,8 +114,33 @@ Important constraints:
 Output format: JSON only."""
 
     def predict_next_attack(self, recent_alerts: List[Dict], time_window_hours: int = 24) -> Dict[str, Any]:
-        """Predict next attack steps based on recent alert patterns."""
+        """Predict next attack steps based on recent alert patterns + knowledge graph enrichment."""
         start_time = time.time()
+
+        # ── Graph enrichment ─────────────────────────────────────────────────
+        graph_intel = {}
+        try:
+            from app.knowledge.knowledge_graph import get_knowledge_graph
+            kg = get_knowledge_graph()
+            if kg.available:
+                # Lateral movement chains already in graph
+                lateral_chains = kg.hunt_lateral_movement()
+                # MITRE coverage gaps
+                mitre_cov = kg.get_mitre_coverage()
+                # Malicious comms
+                mal_comms = kg.hunt_devices_with_malicious_ips()
+                graph_intel = {
+                    "lateral_movement_chains": len(lateral_chains),
+                    "lateral_paths": [(c["from_entity"], c["to_entity"]) for c in lateral_chains[:3]],
+                    "uncovered_techniques": mitre_cov.get("uncovered_techniques", []),
+                    "mitre_coverage_pct": mitre_cov.get("coverage_pct", 0),
+                    "malicious_comm_count": len(mal_comms),
+                }
+                # Ingest alerts into graph
+                for alert in recent_alerts[-5:]:
+                    kg.ingest_alert(alert)
+        except Exception as e:
+            logger.debug(f"ThreatPredictionAgent graph enrichment failed: {e}")
 
         if not recent_alerts:
             return self._empty_prediction()
@@ -164,6 +189,17 @@ Output format: JSON only."""
                 for a in recent_alerts[-10:]
             ]
 
+            graph_section = ""
+            if graph_intel:
+                graph_section = f"""
+KNOWLEDGE GRAPH INTELLIGENCE:
+- Active lateral movement chains: {graph_intel.get('lateral_movement_chains', 0)}
+- Lateral paths: {graph_intel.get('lateral_paths', [])}
+- Uncovered MITRE techniques (no controls): {graph_intel.get('uncovered_techniques', [])}
+- MITRE control coverage: {graph_intel.get('mitre_coverage_pct', 0)}%
+- Devices with malicious comms: {graph_intel.get('malicious_comm_count', 0)}
+"""
+
             prompt = f"""Threat prediction analysis:
 
 RECENT ALERTS (last {len(recent_alerts)} events):
@@ -174,7 +210,7 @@ STATISTICAL ANALYSIS:
 - Dominant tactic: {dominant_tactic}
 - Top attacker IPs: {top_source_ips}
 - Kill chain next stages: {next_stages}
-
+{graph_section}
 Predict the next 3-5 attack actions likely to occur in the next {time_window_hours} hours.
 
 Return JSON:
@@ -206,8 +242,7 @@ Return JSON:
   "prediction_confidence": 0.0-1.0
 }}"""
 
-            raw = self._call_llm(prompt, self._system_prompt())
-            llm_prediction = self._parse_json(raw) or {}
+            llm_prediction = self.call_llm_json(prompt, self._system_prompt()) or {}
         except Exception as e:
             logger.debug(f"ThreatPredictionAgent LLM failed: {e}")
 
@@ -221,6 +256,7 @@ Return JSON:
             "kill_chain_next_stages": next_stages,
             "pattern_based_predictions": pattern_predictions,
             "llm_predictions": llm_prediction,
+            "graph_intel": graph_intel,
             "threat_level": self._compute_threat_level(recent_alerts),
             "prediction_generated_at": datetime.utcnow().isoformat(),
             "prediction_valid_until": (datetime.utcnow() + timedelta(hours=time_window_hours)).isoformat(),

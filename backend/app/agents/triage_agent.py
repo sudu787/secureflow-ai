@@ -63,10 +63,26 @@ class TriageAgent(BaseAgent):
         alert_type = alert.get("alert_type", "unknown")
         evidence = alert.get("evidence", {})
 
-        # Try Gemini AI first
-        ai_result = self._triage_with_ai(alert, evidence)
+        # ── Graph enrichment: ingest alert & get blast radius ───────────
+        source_ip = alert.get("source_ip")
+        graph_context = {}
+        blast_radius_data = {}
+        try:
+            from app.knowledge.knowledge_graph import get_knowledge_graph
+            kg = get_knowledge_graph()
+            kg.ingest_alert(alert)
+            if source_ip:
+                graph_context = kg.get_ip_threat_profile(source_ip)
+                blast_radius_data = kg.propagate_risk(source_ip, "ip", initial_score=confidence)
+        except Exception:
+            pass
+
+        # Try AI triage (prompt is enriched with graph data)
+        ai_result = self._triage_with_ai(alert, evidence, graph_context, blast_radius_data)
         if ai_result:
             ai_result["ai_powered"] = True
+            ai_result["graph_enriched"] = bool(graph_context)
+            ai_result["blast_radius"] = blast_radius_data.get("blast_radius", {})
             return ai_result
 
         # Fallback to heuristic logic
@@ -94,11 +110,31 @@ class TriageAgent(BaseAgent):
                 "tactic": alert.get("mitre_tactic", "N/A"),
                 "technique_name": alert.get("mitre_technique_name", "N/A"),
             },
+            "graph_enriched": bool(graph_context),
+            "blast_radius": blast_radius_data.get("blast_radius", {}),
             "ai_powered": False,
         }
 
-    def _triage_with_ai(self, alert: Dict, evidence: Dict) -> Optional[Dict]:
-        """Use Gemini to perform intelligent triage."""
+    def _triage_with_ai(self, alert: Dict, evidence: Dict, graph_context: Dict = None, blast_radius_data: Dict = None) -> Optional[Dict]:
+        """Use AI to perform intelligent triage with graph enrichment."""
+        graph_context = graph_context or {}
+        blast_radius_data = blast_radius_data or {}
+
+        graph_summary = ""
+        if graph_context.get("total_alerts", 0) > 0:
+            graph_summary = (
+                f"\nKnowledge Graph Context:\n"
+                f"  IP {graph_context.get('ip')} has {graph_context['total_alerts']} prior alerts\n"
+                f"  MITRE techniques observed: {', '.join(graph_context.get('mitre_techniques', []))}\n"
+                f"  Users targeted: {', '.join(graph_context.get('users_targeted', []))}\n"
+            )
+        if blast_radius_data.get("total_affected", 0) > 0:
+            br = blast_radius_data.get("blast_radius", {})
+            graph_summary += (
+                f"  Blast Radius: {blast_radius_data['total_affected']} entities at risk "
+                f"(critical={br.get('critical',0)}, high={br.get('high',0)})\n"
+            )
+
         prompt = (
             f"Triage this security alert and respond with JSON:\n\n"
             f"Alert Title: {alert.get('title', 'Unknown')}\n"
@@ -109,7 +145,8 @@ class TriageAgent(BaseAgent):
             f"Dest IP: {alert.get('dest_ip', 'N/A')}\n"
             f"MITRE Technique: {alert.get('mitre_id', 'N/A')} - {alert.get('mitre_tactic', 'N/A')}\n"
             f"Description: {alert.get('description', 'N/A')}\n"
-            f"Evidence: {json.dumps(evidence, default=str)[:500]}\n\n"
+            f"Evidence: {str(evidence)[:400]}\n"
+            f"{graph_summary}\n"
             f"Respond with this exact JSON structure:\n"
             f'{{\n'
             f'  "priority": "P1|P2|P3|P4",\n'

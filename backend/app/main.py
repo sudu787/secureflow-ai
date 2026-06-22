@@ -39,13 +39,22 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"RAG engine failed to load: {e}")
 
-    # Initialize knowledge graph
+    # Initialize knowledge graph and seed with demo data
     try:
         from app.knowledge.knowledge_graph import get_knowledge_graph
         kg = get_knowledge_graph()
-        logger.info(f"✅ Knowledge graph initialized (available: {kg.available})")
+        kg.seed_demo_data()
+        logger.info(f"✅ Knowledge graph initialized and seeded (available: {kg.available})")
     except Exception as e:
-        logger.warning(f"Knowledge base failed to load: {e}")
+        logger.warning(f"Knowledge graph failed to load: {e}")
+
+    # Initialize GraphRAG Fusion engine
+    try:
+        from app.knowledge.graph_rag_fusion import get_graph_rag_fusion
+        fusion = get_graph_rag_fusion()
+        logger.info("✅ GraphRAG Fusion engine initialized")
+    except Exception as e:
+        logger.warning(f"GraphRAG Fusion failed to initialize: {e}")
 
     # Start ingestion pipeline if enabled
     ingestion_service = None
