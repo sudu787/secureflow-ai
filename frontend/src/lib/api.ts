@@ -303,3 +303,30 @@ export const api = {
   delete: <T = any>(url: string) => fetchAPI<T>(url, { method: 'DELETE' }),
 };
 
+// ─── Part 7: Knowledge Graph Stats & Hunt Queries ────────────────────────────
+export const getGraphStats = () => fetchAPI<any>('/api/knowledge-graph/stats');
+
+export const runAllHunts = () => fetchAPI<any>('/api/knowledge-graph/hunt/all');
+
+export const huntLateralMovement = () =>
+  fetchAPI<any>('/api/knowledge-graph/hunt/lateral-movement');
+
+export const huntMaliciousComms = () =>
+  fetchAPI<any>('/api/knowledge-graph/hunt/malicious-comms');
+
+export const huntHighRiskUsers = () =>
+  fetchAPI<any>('/api/knowledge-graph/hunt/high-risk-users');
+
+export const huntVulnerableAssets = () =>
+  fetchAPI<any>('/api/knowledge-graph/hunt/vulnerable-assets');
+
+export const propagateRisk = (entityId: string, entityType: string) =>
+  fetchAPI<any>('/api/knowledge-graph/risk/propagate', {
+    method: 'POST',
+    body: JSON.stringify({ entity_id: entityId, entity_type: entityType }),
+  });
+
+export const getAttackPath = (sourceId: string, targetId: string) =>
+  fetchAPI<any>(`/api/knowledge-graph/attack-path?source_id=${sourceId}&target_id=${targetId}`);
+
+
