@@ -3,9 +3,116 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   ShieldCheck, AlertTriangle, CheckCircle, XCircle,
-  RefreshCw, Lock, FileCheck, TrendingUp, ChevronDown, ChevronRight
+  RefreshCw, Lock, FileCheck, TrendingUp, ChevronDown, ChevronRight, X, Download
 } from "lucide-react";
 import { getComplianceScore, getComplianceViolations, getComplianceFrameworks, getDashboard } from "@/lib/api";
+
+// ── Audit Report Modal ───────────────────────────────────────────────────────
+function AuditReportModal({ onClose, fwScores, violations }: { onClose: () => void; fwScores: Record<string,number>; violations: any[] }) {
+  const ts = new Date().toLocaleString();
+  const frameworks = [
+    { key: "nist", name: "NIST CSF 2.0",   color: "#6366f1", target: 80,  controls: 108 },
+    { key: "cis",  name: "CIS Controls v8", color: "#06b6d4", target: 85,  controls: 153 },
+    { key: "iso",  name: "ISO 27001",       color: "#10b981", target: 90,  controls: 93  },
+    { key: "soc2", name: "SOC 2 Type II",   color: "#f59e0b", target: 88,  controls: 60  },
+    { key: "pci",  name: "PCI DSS v4",      color: "#8b5cf6", target: 92,  controls: 264 },
+  ];
+  const overallScore = Math.round(Object.values(fwScores).reduce((a, b) => a + b, 0) / 5);
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{ background: "var(--sf-bg-card)", border: "1px solid var(--sf-border)", borderRadius: 16, width: "min(860px, 96vw)", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 40px 80px rgba(0,0,0,0.7)" }}>
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 28px", borderBottom: "1px solid var(--sf-border)", background: "linear-gradient(135deg, rgba(6,182,212,0.1), rgba(99,102,241,0.05))" }}>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--sf-text-primary)" }}>📋 Compliance Audit Report</div>
+            <div style={{ fontSize: 12, color: "var(--sf-text-muted)", marginTop: 4 }}>SecureFlow AI Compliance Intelligence · Generated {ts}</div>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button style={{ background: "rgba(6,182,212,0.15)", border: "1px solid rgba(6,182,212,0.3)", color: "#67e8f9", borderRadius: 8, padding: "6px 14px", cursor: "pointer", fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }} onClick={() => window.print()}>
+              <Download size={12} /> Export PDF
+            </button>
+            <button style={{ background: "rgba(255,255,255,0.06)", border: "1px solid var(--sf-border)", color: "var(--sf-text-muted)", borderRadius: 8, padding: "6px 10px", cursor: "pointer" }} onClick={onClose}><X size={14} /></button>
+          </div>
+        </div>
+        <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* Overall Status */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+            <div style={{ textAlign: "center", background: "rgba(255,255,255,0.02)", borderRadius: 10, padding: 18, border: "1px solid var(--sf-border)" }}>
+              <div style={{ fontSize: 48, fontWeight: 900, color: overallScore >= 80 ? "#10b981" : overallScore >= 60 ? "#eab308" : "#dc2626", lineHeight: 1 }}>{overallScore}</div>
+              <div style={{ fontSize: 11, color: "var(--sf-text-muted)", marginTop: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>Overall Compliance</div>
+              <span className={`sf-badge ${overallScore >= 80 ? "low" : overallScore >= 60 ? "medium" : "critical"}`} style={{ marginTop: 8, display: "inline-block" }}>{overallScore >= 80 ? "COMPLIANT" : overallScore >= 60 ? "REVIEW" : "NON-COMPLIANT"}</span>
+            </div>
+            <div style={{ textAlign: "center", background: "rgba(255,255,255,0.02)", borderRadius: 10, padding: 18, border: "1px solid var(--sf-border)" }}>
+              <div style={{ fontSize: 48, fontWeight: 900, color: violations.length > 0 ? "#dc2626" : "#10b981", lineHeight: 1 }}>{violations.length}</div>
+              <div style={{ fontSize: 11, color: "var(--sf-text-muted)", marginTop: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>Active Violations</div>
+              <span className={`sf-badge ${violations.length > 0 ? "critical" : "low"}`} style={{ marginTop: 8, display: "inline-block" }}>{violations.length > 0 ? "ACTION NEEDED" : "CLEAR"}</span>
+            </div>
+            <div style={{ textAlign: "center", background: "rgba(255,255,255,0.02)", borderRadius: 10, padding: 18, border: "1px solid var(--sf-border)" }}>
+              <div style={{ fontSize: 48, fontWeight: 900, color: "#818cf8", lineHeight: 1 }}>5</div>
+              <div style={{ fontSize: 11, color: "var(--sf-text-muted)", marginTop: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>Frameworks Monitored</div>
+              <span className="sf-badge info" style={{ marginTop: 8, display: "inline-block" }}>CONTINUOUS</span>
+            </div>
+          </div>
+
+          {/* Per-framework scores */}
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--sf-text-primary)", marginBottom: 12 }}>Framework Compliance Breakdown</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {frameworks.map(({ key, name, color, target, controls }) => {
+                const sc = fwScores[key] ?? 75;
+                const gap = Math.max(target - sc, 0);
+                return (
+                  <div key={key} style={{ background: "rgba(255,255,255,0.02)", borderRadius: 10, padding: "14px 18px", border: "1px solid var(--sf-border)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <div>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--sf-text-primary)" }}>{name}</span>
+                        <span style={{ fontSize: 10, color: "var(--sf-text-muted)", marginLeft: 8 }}>{controls} controls</span>
+                      </div>
+                      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                        {gap > 0 && <span style={{ fontSize: 11, color: "#f97316" }}>Gap: {gap} pts to target</span>}
+                        <span style={{ fontSize: 20, fontWeight: 900, color }}>{sc}</span>
+                        <span className={`sf-badge ${sc >= target ? "low" : sc >= target-15 ? "medium" : "critical"}`}>{sc >= target ? "✅ Pass" : sc >= target-15 ? "⚠️ Review" : "❌ Fail"}</span>
+                      </div>
+                    </div>
+                    <div style={{ height: 8, background: "rgba(255,255,255,0.06)", borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ width: `${sc}%`, height: "100%", background: color, borderRadius: 4, transition: "width 1.5s ease", boxShadow: `0 0 8px ${color}60` }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, fontSize: 10, color: "var(--sf-text-muted)" }}>
+                      <span>Current: {sc}%</span>
+                      <span>Target: {target}%</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Recent violations summary */}
+          {violations.length > 0 && (
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--sf-text-primary)", marginBottom: 10 }}>🔴 Recent Violations (Top {Math.min(violations.length, 5)})</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {violations.slice(0, 5).map((v: any, i: number) => (
+                  <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", padding: "10px 14px", background: "rgba(220,38,38,0.05)", borderRadius: 8, border: "1px solid rgba(220,38,38,0.15)" }}>
+                    <span className={`sf-badge ${v.severity}`}>{v.severity}</span>
+                    <div style={{ flex: 1, fontSize: 12, color: "var(--sf-text-secondary)" }}>{v.alert_title}</div>
+                    <div style={{ fontSize: 10, fontFamily: "monospace", color: "#818cf8" }}>{v.nist_mapping?.category || "—"}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Audit trail note */}
+          <div style={{ background: "rgba(99,102,241,0.06)", borderRadius: 10, padding: 16, border: "1px solid rgba(99,102,241,0.2)", fontSize: 12, color: "var(--sf-text-muted)", lineHeight: 1.7 }}>
+            <strong style={{ color: "var(--sf-text-primary)" }}>🔒 Audit Trail Notice:</strong> All compliance violations are automatically logged with timestamps, alert IDs, agent classifications, and framework control mappings. This report is generated from live data and reflects the current compliance posture of the organization. For a full audit trail export, contact your SecureFlow AI administrator.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const FRAMEWORKS_STATIC = [
   { key: "nist",  name: "NIST CSF 2.0",  color: "#6366f1", target: 80, icon: "🏛️",
@@ -43,6 +150,7 @@ export default function ComplianceIntelligenceCenter() {
   const [dash, setDash]           = useState<any>(null);
   const [loading, setLoading]     = useState(true);
   const [expanded, setExpanded]   = useState<string | null>(null);
+  const [showAudit, setShowAudit] = useState(false);
 
   const load = useCallback(async () => {
     const results = await Promise.allSettled([
@@ -83,7 +191,7 @@ export default function ComplianceIntelligenceCenter() {
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button className="sf-btn sf-btn-secondary sf-btn-sm" onClick={load}><RefreshCw size={13} /> Refresh</button>
-          <button className="sf-btn sf-btn-primary sf-btn-sm">
+          <button className="sf-btn sf-btn-primary sf-btn-sm" onClick={() => setShowAudit(true)}>
             <FileCheck size={13} /> Audit Report
           </button>
         </div>
@@ -234,6 +342,15 @@ export default function ComplianceIntelligenceCenter() {
           </table>
         )}
       </div>
+
+      {/* Audit Report Modal */}
+      {showAudit && (
+        <AuditReportModal
+          onClose={() => setShowAudit(false)}
+          fwScores={fwScores}
+          violations={violations}
+        />
+      )}
     </div>
   );
 }

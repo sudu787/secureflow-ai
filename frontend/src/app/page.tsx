@@ -96,7 +96,7 @@ export default function DashboardPage() {
     return () => clearInterval(timer);
   }, [data?.stats?.risk_score]);
 
-  const stats        = data?.stats ?? {};
+  const stats: any   = data?.stats ?? {};
   const riskScore    = liveRisk;
   const riskLevel    = stats.risk_level ?? "low";
   const criticalAlerts = stats.critical_alerts ?? 0;

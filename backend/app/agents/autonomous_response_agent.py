@@ -179,6 +179,23 @@ Output format: JSON only. No prose explanations outside JSON structure."""
                 f"  Malicious comms detected: {graph_context.get('malicious_comms', 0)}\n"
             )
 
+        memory_section = ""
+        mem = incident.get("memory_match")
+        if mem:
+            memory_section = (
+                f"\nEPISODIC MEMORY RECALL (Similarity: {mem.get('similarity_pct')}):\n"
+                f"  Past Incident: {mem.get('title')}\n"
+                f"  Mitigations that worked: {', '.join(mem.get('mitigations', []))}\n"
+            )
+
+        rag_section = ""
+        rag = incident.get("rag_evidence", [])
+        if rag:
+            rag_section = "\nTHREAT INTELLIGENCE (MITRE/CISA RAG):\n"
+            for r in rag:
+                data = r.get("data", {})
+                rag_section += f"  - [{r.get('source', '').upper()}] {data.get('name', data.get('title', ''))}: {data.get('description', data.get('content', ''))[:150]}...\n"
+
         return f"""Incident requiring autonomous response:
 
 INCIDENT DETAILS:
@@ -188,7 +205,7 @@ INCIDENT DETAILS:
 - Affected Asset: {affected_asset}
 - MITRE Technique: {mitre_technique}
 - Autonomy Mode: {mode.upper()}
-{graph_section}
+{graph_section}{memory_section}{rag_section}
 AVAILABLE RESPONSE ACTIONS:
 {available_actions}
 
@@ -281,6 +298,21 @@ Return JSON with this exact structure:
                     action["status"] = "pending_approval"
                     action["queued_at"] = datetime.utcnow().isoformat()
                     action["incident_id"] = incident.get("id", "unknown")
+                    
+                    # Generate dynamic XAI chain for the frontend explainer
+                    xai_chain = []
+                    xai_chain.append({"icon": "🔴", "label": "Severity", "value": f"{incident.get('severity', 'High').capitalize()} — High impact detected", "source": "Alert Triage"})
+                    if graph_ctx.get("total_affected"):
+                        xai_chain.append({"icon": "🕸️", "label": "Graph Intel", "value": f"Blast radius: {graph_ctx.get('total_affected')} nodes", "source": "Knowledge Graph"})
+                    if incident.get("memory_match"):
+                        mem = incident.get("memory_match")
+                        xai_chain.append({"icon": "🧠", "label": "Memory", "value": f"Similar to {mem.get('title')} ({mem.get('similarity_pct')} match)", "source": "Org Memory"})
+                    if incident.get("rag_evidence"):
+                        rag = incident.get("rag_evidence")[0]
+                        xai_chain.append({"icon": "🎯", "label": "MITRE", "value": f"{rag['id']} — {rag['data'].get('name', '')}", "source": "Threat Intel RAG"})
+                    xai_chain.append({"icon": "📊", "label": "Confidence", "value": f"{int((action.get('confidence', 0.92)) * 100)}% — {action.get('justification', 'Containment recommended')}", "source": "Agent Consensus"})
+                    action["xai_evidence"] = xai_chain
+                    
                     queued_for_approval.append(action)
                     _approval_queue.append(action)
                 else:

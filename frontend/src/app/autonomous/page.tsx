@@ -214,7 +214,7 @@ export default function AutonomousResponseCenter() {
                   {/* XAI Evidence Chain */}
                   {expandedXAI === idx && (
                     <div className="sf-xai-chain sf-animate-in" style={{ marginBottom: 12, padding: "10px 12px", background: "rgba(99,102,241,0.05)", borderRadius: 8, border: "1px solid rgba(99,102,241,0.15)" }}>
-                      {(XAI_REASONS[idx] ?? XAI_REASONS[0]).map((item: any, ji: number) => (
+                      {(action.xai_evidence || XAI_REASONS[idx] || XAI_REASONS[0]).map((item: any, ji: number) => (
                         <div key={ji} className="sf-xai-item">
                           <div className="sf-xai-dot" style={{ background: "rgba(99,102,241,0.2)", color: "#818cf8" }}>{item.icon}</div>
                           <div className="sf-xai-content">

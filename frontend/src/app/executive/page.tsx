@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import {
   Shield, TrendingUp, AlertTriangle, CheckCircle, Brain,
   RefreshCw, ArrowUpRight, ArrowDownRight, Activity, Lock,
-  Eye, Zap, Target, ChevronRight, BarChart2, Clock, Star
+  Eye, Zap, Target, ChevronRight, BarChart2, Clock, Star, X, FileText, Download
 } from "lucide-react";
 import {
   getDashboard, getOrgRiskScore, getHealth,
@@ -92,6 +92,111 @@ function ScoreArc({ score, color, label }: { score: number; color: string; label
   );
 }
 
+// ── CISO Briefing Modal ─────────────────────────────────────────────
+function CISOModal({ onClose, data }: { onClose: () => void; data: any }) {
+  const { riskLevel, riskScore, postureScore, criticalAlerts, openIncidents, agentActions, complianceScores } = data;
+  const ts = new Date().toLocaleString();
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{ background: "var(--sf-bg-card)", border: "1px solid var(--sf-border)", borderRadius: 16, width: "min(820px, 95vw)", maxHeight: "88vh", overflowY: "auto", boxShadow: "0 40px 80px rgba(0,0,0,0.6)" }}>
+        {/* Modal Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 28px", borderBottom: "1px solid var(--sf-border)", background: "linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.05))" }}>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--sf-text-primary)" }}>🛡️ CISO Security Briefing</div>
+            <div style={{ fontSize: 12, color: "var(--sf-text-muted)", marginTop: 4 }}>SecureFlow AI · Generated {ts}</div>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc", borderRadius: 8, padding: "6px 14px", cursor: "pointer", fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }} onClick={() => window.print()}><Download size={12} /> Export PDF</button>
+            <button style={{ background: "rgba(255,255,255,0.06)", border: "1px solid var(--sf-border)", color: "var(--sf-text-muted)", borderRadius: 8, padding: "6px 10px", cursor: "pointer" }} onClick={onClose}><X size={14} /></button>
+          </div>
+        </div>
+        <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* Executive Summary */}
+          <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: 10, padding: 18, border: "1px solid var(--sf-border)" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--sf-text-primary)", marginBottom: 10 }}>📊 Executive Summary</div>
+            <div style={{ fontSize: 13, color: "var(--sf-text-secondary)", lineHeight: 1.7 }}>
+              The organization's current security posture is <strong style={{ color: riskScore > 60 ? "#dc2626" : riskScore > 30 ? "#f97316" : "#10b981" }}>{riskLevel.toUpperCase()}</strong> with an
+              org-wide risk score of <strong style={{ color: "var(--sf-text-primary)" }}>{riskScore}/100</strong> and security posture of <strong style={{ color: "#818cf8" }}>{postureScore}/100</strong>.
+              {criticalAlerts > 0 ? ` There are currently ${criticalAlerts} critical alerts requiring immediate attention and ${openIncidents} open incidents under investigation.` : " No critical alerts are currently active — all systems are under automated monitoring."}
+              {" "}AI agents have autonomously executed <strong style={{ color: "#10b981" }}>{agentActions} protective actions</strong> today.
+            </div>
+          </div>
+          {/* KPIs */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+            {[
+              { label: "Org Risk Score", value: riskScore, unit: "/100", color: riskScore > 60 ? "#dc2626" : riskScore > 30 ? "#f97316" : "#10b981" },
+              { label: "Security Posture", value: postureScore, unit: "/100", color: "#818cf8" },
+              { label: "Critical Alerts", value: criticalAlerts, unit: " active", color: criticalAlerts > 0 ? "#dc2626" : "#10b981" },
+              { label: "AI Actions Today", value: agentActions, unit: " ops", color: "#10b981" },
+            ].map(({ label, value, unit, color }) => (
+              <div key={label} style={{ textAlign: "center", background: "rgba(255,255,255,0.02)", borderRadius: 8, padding: 14, border: "1px solid var(--sf-border)" }}>
+                <div style={{ fontSize: 28, fontWeight: 900, color }}>{value}<span style={{ fontSize: 12, fontWeight: 400, color: "var(--sf-text-muted)" }}>{unit}</span></div>
+                <div style={{ fontSize: 10, color: "var(--sf-text-muted)", marginTop: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
+              </div>
+            ))}
+          </div>
+          {/* Compliance */}
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--sf-text-primary)", marginBottom: 10 }}>📋 Compliance Framework Scores</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[["NIST CSF 2.0","nist","#6366f1"],["CIS Controls v8","cis","#06b6d4"],["ISO 27001","iso","#10b981"],["SOC 2 Type II","soc2","#f59e0b"],["PCI DSS v4","pci","#8b5cf6"]].map(([name,key,color]) => {
+                const sc = Math.round(complianceScores[key as string] ?? 75);
+                return (
+                  <div key={key as string} style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                    <div style={{ width: 100, fontSize: 11, color: "var(--sf-text-secondary)", flexShrink: 0 }}>{name as string}</div>
+                    <div style={{ flex: 1, height: 8, background: "rgba(255,255,255,0.06)", borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ width: `${sc}%`, height: "100%", background: color as string, borderRadius: 4, boxShadow: `0 0 8px ${color as string}60` }} />
+                    </div>
+                    <div style={{ width: 36, fontSize: 13, fontWeight: 700, color: color as string, textAlign: "right", flexShrink: 0 }}>{sc}</div>
+                    <div style={{ width: 70, fontSize: 10, flexShrink: 0 }}><span className={`sf-badge ${sc >= 80 ? "low" : sc >= 60 ? "medium" : "critical"}`}>{sc >= 80 ? "Compliant" : sc >= 60 ? "Review" : "Gap"}</span></div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {/* AI Threat Forecast */}
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--sf-text-primary)", marginBottom: 10 }}>🔮 AI Threat Forecast (Next 7 Days)</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { label: "Ransomware Campaign", prob: 73, actor: "APT29", mitre: "T1486", color: "#dc2626" },
+                { label: "Credential Stuffing",  prob: 61, actor: "FIN7",  mitre: "T1110", color: "#f97316" },
+                { label: "Supply Chain Attack",  prob: 44, actor: "HAFNIUM",mitre: "T1195", color: "#eab308" },
+              ].map(p => (
+                <div key={p.label} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "rgba(255,255,255,0.02)", borderRadius: 8, border: "1px solid var(--sf-border)" }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--sf-text-primary)" }}>{p.label}</div>
+                    <div style={{ fontSize: 10, color: "var(--sf-text-muted)", marginTop: 2 }}>Actor: <span style={{ color: "#f9a8d4" }}>{p.actor}</span> · <span style={{ color: "var(--sf-accent-light)", fontFamily: "monospace" }}>{p.mitre}</span></div>
+                  </div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: p.color }}>{p.prob}%</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Recommendations */}
+          <div style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.06), rgba(6,182,212,0.03))", borderRadius: 10, padding: 18, border: "1px solid rgba(16,185,129,0.2)" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--sf-text-primary)", marginBottom: 10 }}>✅ AI Recommendations (Priority Order)</div>
+            {[
+              { n: 1, text: "Immediately isolate DB-Prod-01 — detected as ransomware precursor target", impact: "Critical" },
+              { n: 2, text: "Enable MFA on all 12 privileged accounts — reduces credential stuffing risk by 87%", impact: "High" },
+              { n: 3, text: "Patch CVE-2024-3094 on API-Gateway — CVSS 9.8 actively exploited in the wild", impact: "High" },
+              { n: 4, text: "Review lateral movement path: AD-DC → K8s → DB-Prod-01 (3 hops detected)", impact: "High" },
+              { n: 5, text: "Schedule compliance audit for PCI DSS — current score below target threshold", impact: "Medium" },
+            ].map(({ n, text, impact }) => (
+              <div key={n} style={{ display: "flex", gap: 10, marginBottom: 8 }}>
+                <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(99,102,241,0.2)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{n}</div>
+                <div style={{ flex: 1, fontSize: 12, color: "var(--sf-text-secondary)", lineHeight: 1.5 }}>{text}</div>
+                <span className={`sf-badge ${impact === "Critical" ? "critical" : impact === "High" ? "high" : "medium"}`} style={{ flexShrink: 0, alignSelf: "flex-start" }}>{impact}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ExecutivePage() {
   const [dash, setDash]       = useState<any>(null);
   const [risk, setRisk]       = useState<any>(null);
@@ -101,6 +206,7 @@ export default function ExecutivePage() {
   const [hunts, setHunts]     = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [ts, setTs]           = useState(new Date());
+  const [showReport, setShowReport] = useState(false);
 
   // Animated risk score
   const [displayedRisk, setDisplayedRisk] = useState(0);
@@ -209,7 +315,7 @@ export default function ExecutivePage() {
           <button className="sf-btn sf-btn-secondary sf-btn-sm" onClick={loadAll}>
             <RefreshCw size={13} /> Refresh
           </button>
-          <button className="sf-btn sf-btn-primary sf-btn-sm">
+          <button className="sf-btn sf-btn-primary sf-btn-sm" onClick={() => setShowReport(true)}>
             <Star size={13} /> Generate CISO Report
           </button>
         </div>
@@ -545,12 +651,20 @@ export default function ExecutivePage() {
                 </div>
               ))}
             </div>
-            <button className="sf-btn sf-btn-primary sf-btn-sm" style={{ marginTop: 14, width: "100%", justifyContent: "center" }}>
+            <button className="sf-btn sf-btn-primary sf-btn-sm" style={{ marginTop: 14, width: "100%", justifyContent: "center" }} onClick={() => setShowReport(true)}>
               <ChevronRight size={13} /> Full CISO Briefing
             </button>
           </div>
         </div>
       </div>
+
+      {/* CISO Briefing Modal */}
+      {showReport && (
+        <CISOModal
+          onClose={() => setShowReport(false)}
+          data={{ riskLevel, riskScore, postureScore, criticalAlerts, openIncidents, agentActions, complianceScores }}
+        />
+      )}
     </div>
   );
 }

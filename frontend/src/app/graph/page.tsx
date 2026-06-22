@@ -131,10 +131,11 @@ export default function GraphExplorer() {
 
   function getNodeSize(node: any): number {
     const type = node.type || "";
-    if (["incident", "threat_actor"].includes(type)) return 3.5;
-    if (["malware", "cve", "ioc"].includes(type)) return 2.5;
-    if (["asset", "user"].includes(type)) return 2;
-    return 1.5;
+    if (["incident", "threat_actor"].includes(type)) return 14;
+    if (["malware", "cve"].includes(type)) return 12;
+    if (["asset", "user", "ioc"].includes(type)) return 10;
+    if (["alert", "device"].includes(type)) return 9;
+    return 7;
   }
 
   const getNodeColor = useCallback((node: any): string => {
@@ -197,24 +198,38 @@ export default function GraphExplorer() {
   }, [filteredData]);
 
   const drawNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-    const label    = node.label || node.id;
-    const fontSize = Math.max(12 / globalScale, 2);
-    const radius   = node.val ? Math.max(node.val * 2.8, 5) : 8;
-    const color    = getNodeColor(node);
+    // Guard: skip drawing if positions aren't assigned yet by D3 force simulation
+    if (!isFinite(node.x) || !isFinite(node.y)) return;
 
+    const label  = (node.label || node.id || "").split(":").pop() || "";
+    const radius = node.val || 8;
+    const color  = getNodeColor(node);
+    const isSelected = selectedNode?.id === node.id;
+
+    // Outer glow ring
     ctx.shadowColor = color;
-    ctx.shadowBlur  = 15;
+    ctx.shadowBlur  = isSelected ? 24 : 12;
+
+    // Main circle fill with gradient
+    const grad = ctx.createRadialGradient(node.x - radius * 0.3, node.y - radius * 0.3, 0, node.x, node.y, radius);
+    grad.addColorStop(0, color + "ee");
+    grad.addColorStop(1, color + "88");
     ctx.beginPath();
     ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = color;
+    ctx.fillStyle = grad;
     ctx.fill();
 
-    // Risk ring for propagation view
+    // Border
+    ctx.strokeStyle = isSelected ? "#ffffff" : color + "cc";
+    ctx.lineWidth   = isSelected ? 2.5 / globalScale : 1.5 / globalScale;
+    ctx.stroke();
+
+    // Risk dashed ring
     if (riskData && activeView === "risk") {
       const affected = (riskData.affected_entities || []).find((e: any) => e.entity === node.id);
       if (affected) {
         ctx.beginPath();
-        ctx.arc(node.x, node.y, radius + 4, 0, 2 * Math.PI);
+        ctx.arc(node.x, node.y, radius + 5 / globalScale, 0, 2 * Math.PI);
         ctx.strokeStyle = color;
         ctx.lineWidth = 1.5 / globalScale;
         ctx.setLineDash([3, 3]);
@@ -224,30 +239,43 @@ export default function GraphExplorer() {
     }
 
     ctx.shadowBlur = 0;
-    ctx.fillStyle  = "#ffffff";
-    ctx.textAlign  = "center";
-    ctx.textBaseline = "middle";
-    ctx.font = `${radius * 0.85}px Arial`;
-    ctx.fillText(ENTITY_ICONS[node.type] || "•", node.x, node.y);
 
-    const isSelected = selectedNode?.id === node.id;
-    if (globalScale > 1.1 || isSelected) {
-      ctx.font = `${isSelected ? "bold " : ""}${fontSize}px Sans-Serif`;
-      ctx.fillStyle = isSelected ? "#ffffff" : "rgba(255,255,255,0.75)";
-      ctx.fillText(label, node.x, node.y + radius + fontSize + 3);
-      if (isSelected) {
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, radius + 7, 0, 2 * Math.PI);
-        ctx.strokeStyle = "#6366f1";
-        ctx.lineWidth   = 2 / globalScale;
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
+    // Icon inside (only if big enough on screen)
+    const screenRadius = radius * globalScale;
+    if (screenRadius > 8) {
+      const iconSize = Math.min(radius * 1.0, 14 / globalScale);
+      ctx.font = `${iconSize}px Arial`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.fillText(ENTITY_ICONS[node.type] || "●", node.x, node.y);
+    }
+
+    // Label below node (always show, scale with zoom)
+    const fontSize = Math.max(10 / globalScale, 1.5);
+    if (screenRadius > 4 || isSelected) {
+      ctx.font = `${isSelected ? "bold " : ""}${fontSize}px Inter, Sans-Serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+
+      // Label background pill
+      const textWidth = ctx.measureText(label).width;
+      const padX = 3 / globalScale;
+      const padY = 1.5 / globalScale;
+      const lx = node.x - textWidth / 2 - padX;
+      const ly = node.y + radius + 3 / globalScale;
+      ctx.fillStyle = "rgba(10,14,26,0.75)";
+      ctx.beginPath();
+      ctx.roundRect(lx, ly, textWidth + padX * 2, fontSize + padY * 2, 2 / globalScale);
+      ctx.fill();
+
+      ctx.fillStyle = isSelected ? "#ffffff" : "rgba(220,220,255,0.9)";
+      ctx.fillText(label, node.x, ly + padY);
     }
   }, [selectedNode, getNodeColor, riskData, activeView]);
 
   const paintHitArea = useCallback((node: any, color: string, ctx: CanvasRenderingContext2D) => {
+    if (!isFinite(node.x) || !isFinite(node.y)) return;
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(node.x, node.y, 14, 0, 2 * Math.PI);
@@ -329,14 +357,21 @@ export default function GraphExplorer() {
               height={dimensions.height}
               linkColor={getLinkColor}
               linkWidth={1.5}
-              linkDirectionalParticles={3}
-              linkDirectionalParticleWidth={2}
-              linkDirectionalParticleSpeed={0.005}
+              linkDirectionalParticles={4}
+              linkDirectionalParticleWidth={3}
+              linkDirectionalParticleSpeed={0.004}
               linkDirectionalParticleColor={getLinkColor}
               onNodeClick={handleNodeClick}
               nodeCanvasObject={drawNode}
+              nodeCanvasObjectMode={() => "replace"}
               nodePointerAreaPaint={paintHitArea}
               backgroundColor="transparent"
+              onEngineStop={() => {
+                if (fgRef.current) fgRef.current.zoomToFit(600, 40);
+              }}
+              cooldownTicks={80}
+              d3AlphaDecay={0.02}
+              d3VelocityDecay={0.3}
             />
           )}
 
@@ -504,8 +539,8 @@ export default function GraphExplorer() {
                   <span style={{ color: "var(--sf-text-secondary)" }}>{e.entity.split(":")[1]}</span>
                   <span style={{
                     padding: "1px 6px", borderRadius: 4, fontWeight: 700,
-                    background: ({ critical: "rgba(239,68,68,0.15)", high: "rgba(249,115,22,0.15)", medium: "rgba(245,158,11,0.15)", low: "rgba(16,185,129,0.15)" })[e.risk_level] || "transparent",
-                    color: ({ critical: "#ef4444", high: "#f97316", medium: "#f59e0b", low: "#10b981" })[e.risk_level] || "#fff",
+                    background: ({ critical: "rgba(239,68,68,0.15)", high: "rgba(249,115,22,0.15)", medium: "rgba(245,158,11,0.15)", low: "rgba(16,185,129,0.15)" } as any)[e.risk_level] || "transparent",
+                    color: ({ critical: "#ef4444", high: "#f97316", medium: "#f59e0b", low: "#10b981" } as any)[e.risk_level] || "#fff",
                   }}>
                     {(e.risk_score * 100).toFixed(0)}%
                   </span>

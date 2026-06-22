@@ -30,25 +30,21 @@ def consolidate_memory(req: ConsolidateRequest, db: Session = Depends(get_db)):
     }
 
 @router.get("/recent")
-def get_recent_memories(limit: int = 10, db: Session = Depends(get_db)):
+def get_recent_memories(limit: int = 10):
     """Fetch the latest consolidated incident memories."""
-    memories = MemoryService.get_recent_memories(db, limit)
-    return [
-        {
-            "id": m.id,
-            "title": m.title,
-            "root_cause_summary": m.root_cause_summary,
-            "mitigation_applied": m.mitigation_applied,
-            "iocs": m.iocs,
-            "vector_id": m.vector_id,
-            "created_at": m.created_at
-        }
-        for m in memories
-    ]
+    from app.knowledge.incident_memory import get_all_memories
+    mems = get_all_memories()
+    return mems[:limit]
 
 @router.get("/search")
 def search_memory(q: str):
-    """Semantic search through past memories using the RAG engine."""
-    rag = get_rag_engine()
-    results = rag.search(query=q, top_k=5, source_filter="incident_memory")
+    """Semantic search through past memories using the TF-IDF engine."""
+    from app.knowledge.incident_memory import recall_similar_incidents
+    results = recall_similar_incidents(query=q, top_k=5)
     return {"results": results}
+
+@router.get("/all")
+def get_all():
+    """Get all seeded memories for the Memory Center."""
+    from app.knowledge.incident_memory import get_all_memories
+    return {"memories": get_all_memories()}
