@@ -267,3 +267,11 @@ export const correlateAlertIOCs = (alertId: number) =>
   fetchAPI<any>(`/api/prediction/ioc/correlate/${alertId}`, { method: 'POST' });
 export const getThreatCampaigns = () => fetchAPI<any>('/api/prediction/ioc/campaigns');
 
+// ─── General API Helper (Used by some components) ──────────────────────────
+export const api = {
+  get: <T = any>(url: string) => fetchAPI<T>(url),
+  post: <T = any>(url: string, body?: any) => fetchAPI<T>(url, { method: 'POST', body: body ? JSON.stringify(body) : undefined }),
+  patch: <T = any>(url: string, body?: any) => fetchAPI<T>(url, { method: 'PATCH', body: body ? JSON.stringify(body) : undefined }),
+  delete: <T = any>(url: string) => fetchAPI<T>(url, { method: 'DELETE' }),
+};
+

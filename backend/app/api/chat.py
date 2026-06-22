@@ -54,7 +54,8 @@ async def send_message(data: ChatMessage, db: Session = Depends(get_db)):
     _add_message(session, "user", sanitized)
 
     # Step 4: Process through agent orchestrator
-    result = orchestrator.handle_chat_message(sanitized, data.session_type, db)
+    chat_history_str = "\n".join([f"{msg['role'].capitalize()}: {msg['content']}" for msg in (session.messages[:-1] or [])])
+    result = orchestrator.handle_chat_message(sanitized, data.session_type, db, chat_history_str)
 
     # Step 5: Output validation
     response_text = result.get("response", "")

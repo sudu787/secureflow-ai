@@ -71,7 +71,7 @@ def _get_grok_client():
             return None
 
         from openai import OpenAI
-        _grok_client = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
+        _grok_client = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1", max_retries=0)
         logger.info("✅ Grok (xAI) API initialized successfully (grok-3-mini-fast).")
         return _grok_client
     except Exception as e:
@@ -94,7 +94,7 @@ def _get_groq_client():
             return None
 
         from openai import OpenAI
-        _groq_client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
+        _groq_client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1", max_retries=0)
         logger.info("✅ Groq API initialized successfully (llama-3.3-70b-versatile).")
         return _groq_client
     except Exception as e:
@@ -196,7 +196,7 @@ class BaseAgent(ABC):
         self.capabilities: List[str] = []
         self.version: str = "1.0.0"
         # Each agent declares its preferred LLM provider: "gemini", "grok", or "groq"
-        self.llm_provider: str = "groq"  # Default to Groq
+        self.llm_provider: str = "gemini"  # Default to Gemini
         # Adaptive token limits — smaller for triage, larger for investigation
         self.max_tokens: int = 2048
 

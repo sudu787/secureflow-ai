@@ -283,8 +283,40 @@ class AdvancedRAGEngine:
                     f"- [{source}] {data.get('name', '')}: {data.get('trigger', '')} | "
                     f"Steps: {'; '.join(steps[:4])}"
                 )
+            elif r["source"] == "incident_memory":
+                context_parts.append(
+                    f"- [MEMORY] {data.get('title', '')}: {data.get('content', '')} | "
+                    f"Mitigation: {data.get('Mitigation', '')[:150]}"
+                )
 
         return "\n".join(context_parts)
+
+    def add_incident_memory(self, memory_id: str, text: str, metadata: dict):
+        """Add a resolved incident summary to the vector DB dynamically."""
+        if not self._loaded:
+            self.load()
+            
+        # Encode
+        embedding = self.encoder.encode([text])[0].tolist()
+        
+        # Add to Chroma
+        self.collection.add(
+            ids=[memory_id],
+            documents=[text],
+            metadatas=[metadata],
+            embeddings=[embedding]
+        )
+        
+        # Update raw docs and BM25 index
+        doc_obj = {"id": memory_id, "title": metadata.get("title", ""), "content": text}
+        self._raw_docs.append(doc_obj)
+        self._doc_ids.append(memory_id)
+        
+        # Rebuild BM25 completely to include the new document
+        tokenized_corpus = [doc.get("content", str(doc)).lower().split(" ") for doc in self._raw_docs]
+        from rank_bm25 import BM25Okapi
+        self._bm25 = BM25Okapi(tokenized_corpus)
+        logger.info(f"Added incident memory {memory_id} to RAG engine.")
 
     def stats(self) -> Dict:
         return {

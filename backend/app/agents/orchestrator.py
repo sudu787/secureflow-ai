@@ -72,7 +72,7 @@ class Orchestrator:
         else:
             return "general"
 
-    def handle_chat_message(self, message: str, session_type: str = "general", db: Session = None) -> Dict[str, Any]:
+    def handle_chat_message(self, message: str, session_type: str = "general", db: Session = None, chat_history: str = "") -> Dict[str, Any]:
         """Handle an incoming chat message by routing to the appropriate agent."""
         start_time = time.time()
 
@@ -87,7 +87,7 @@ class Orchestrator:
         result = {}
 
         if category == "it_support":
-            agent_result = self.it_support.execute({"message": message})
+            agent_result = self.it_support.execute({"message": message, "chat_history": chat_history})
             agent_name = "it_support_agent"
             response = agent_result.get("result", {}).get("response", "I can help with that. Could you provide more details?")
             confidence = agent_result.get("confidence", 0.5)
@@ -111,6 +111,7 @@ class Orchestrator:
                 "alert": {"title": message, "description": message, "severity": "medium"},
                 "triage": {"priority": "P3"},
                 "related_events": [],
+                "chat_history": chat_history,
             })
             ai_response = agent_result.get("result", {}).get("detailed_summary", "")
             if ai_response and agent_result.get("ai_powered"):
@@ -138,6 +139,7 @@ class Orchestrator:
                 "triage": {},
                 "investigation": {},
                 "remediation": {},
+                "chat_history": chat_history,
             })
             ai_response = agent_result.get("result", {}).get("executive_report", "")
             if ai_response and agent_result.get("ai_powered"):
