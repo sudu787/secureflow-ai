@@ -63,6 +63,21 @@ Threat Detected (4 seconds)
 
 ---
 
+## 👨‍⚖️ For Judges: How to Evaluate This Project
+
+If you only have 5 minutes to test SecureFlow AI, follow this exact path:
+
+1. **Start the Demo:** Go to [`http://localhost:3000/demo`](http://localhost:3000/demo) and click **"Launch Full Ransomware Attack"**. This simulates 9 stages of an APT29 attack.
+2. **Watch the AI Triage:** Go to [`http://localhost:3000/alerts`](http://localhost:3000/alerts) to see the `Triage Agent` automatically prioritizing the incoming simulated logs.
+3. **Trace the Kill Chain:** Go to [`http://localhost:3000/graph`](http://localhost:3000/graph) to view the **Security Knowledge Graph**. Watch the nodes turn red as the blast radius computes the cascading risk of the ransomware spreading.
+4. **Test Autonomous XAI:** Go to [`http://localhost:3000/autonomous`](http://localhost:3000/autonomous). See the `Response Agent` generating playbooks. Click **"View AI Reasoning"** to see the Explainable AI (XAI) evidence chain.
+5. **View the CISO Report:** Go to [`http://localhost:3000/executive`](http://localhost:3000/executive) to see how the `Reporting Agent` has synthesized the live attack into a boardroom-ready presentation and mapped it to Compliance frameworks.
+6. **Test the Episodic Memory:** Go to [`http://localhost:3000/memory`](http://localhost:3000/memory) and click **"Simulate Nightly Consolidation"** to see the system learn from the attack, burning it into ChromaDB vector memory for future recall.
+
+*For full evaluation criteria mapping, see [JUDGES.md](JUDGES.md).*
+
+---
+
 ## 🏗️ Architecture
 
 ![System Architecture](docs/architecture/system-architecture.png)
@@ -187,33 +202,50 @@ https://github.com/sudu787/secureflow-ai.git
 cd secureflow-ai
 ```
 
-### 2. Backend
+### 2. Configure Environment (CRITICAL FOR AI AGENTS)
 ```bash
+cp .env.example .env
+```
+Edit `.env` and add your API keys:
+- `GEMINI_API_KEY=your_key_here` (Powers the Investigation & Reporting Agents)
+- `GROK_API_KEY=your_key_here` (Powers the Triage & Autonomous Agents)
+- `GROQ_API_KEY=your_key_here` (Powers the IT Support Agent fallback)
+
+### 3. Start Backend
+
+**For Windows (PowerShell):**
+```powershell
 cd backend
 python -m venv venv
-
-# Windows
 .\venv\Scripts\Activate.ps1
-
-# macOS/Linux  
-source venv/bin/activate
-
+$env:PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --port 8000
 ```
 
-### 3. Frontend
+**For macOS/Linux:**
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+export PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
+pip install -r requirements.txt
+python -m uvicorn app.main:app --reload --port 8000
+```
+
+### 4. Start Frontend
+Open a **new terminal window/tab**, then run:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### 4. Open
+### 5. Open & Test
 ```
 http://localhost:3000        ← Full platform
-http://localhost:3000/demo  ← Launch ransomware simulation
-http://localhost:8000/docs  ← FastAPI interactive API docs
+http://localhost:3000/demo   ← Launch ransomware simulation
+http://localhost:8000/docs   ← FastAPI interactive API docs
 ```
 
 ---
@@ -242,11 +274,7 @@ http://localhost:8000/docs  ← FastAPI interactive API docs
 
 ---
 
-## 🙋 Team
 
-Built at **FlowZint AI Hackathon 2026** by [Your Team Name]
-
----
 
 ## 📄 License
 
