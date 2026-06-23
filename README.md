@@ -179,13 +179,13 @@ All 5 AI agents respond autonomously. Navigate to `/graph` to see risk propagati
 |---|---|
 | ![War Room](screenshots/war-room.png) | ![Graph](screenshots/knowledge-graph.png) |
 
-| Autonomous Response + XAI | Executive Dashboard |
+| Autonomous Response + XAI | Risk Prediction |
 |---|---|
-| ![XAI](screenshots/autonomous-xai.png) | ![Executive](screenshots/executive-dashboard.png) |
+| ![XAI](screenshots/autonomous-xai.png) | ![Risk](screenshots/risk-prediction.png) |
 
-| Risk Prediction | Compliance Intelligence |
+| Compliance Intelligence | |
 |---|---|
-| ![Risk](screenshots/risk-prediction.png) | ![Compliance](screenshots/compliance.png) |
+| ![Compliance](screenshots/compliance.png) | |
 
 ---
 
