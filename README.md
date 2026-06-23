@@ -183,7 +183,7 @@ All 5 AI agents respond autonomously. Navigate to `/graph` to see risk propagati
 
 ### 1. Clone
 ```bash
-https://github.com/sudu787/agenticsoc.git
+https://github.com/sudu787/secureflow-ai.git
 cd secureflow-ai
 ```
 
